@@ -1,6 +1,5 @@
 package com.smartstaff.intellirecruit.entity;
 
-import com.smartstaff.intellirecruit.enums.Role;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -27,5 +26,11 @@ public class User {
     @Column(nullable = false)
     private String password;
 
+    @Enumerated
+    @Column(nullable = false)
     private Role role;
+
+    public enum Role {
+        CANDIDATE, EMPLOYER, ADMIN
+    }
 }

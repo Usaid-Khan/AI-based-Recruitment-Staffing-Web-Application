@@ -1,6 +1,5 @@
 package com.smartstaff.intellirecruit.entity;
 
-import com.smartstaff.intellirecruit.enums.Status;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -36,4 +35,8 @@ public class Application {
     @CreationTimestamp
     @Column(name = "applied_at", updatable = false)
     private LocalDateTime appliedAt;
+
+    public enum Status {
+        APPLIED, SHORTLISTED, INTERVIEWED, OFFERED, REJECTED, WITHDRAWN
+    }
 }
