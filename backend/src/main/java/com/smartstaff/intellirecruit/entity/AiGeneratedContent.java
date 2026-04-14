@@ -1,6 +1,5 @@
 package com.smartstaff.intellirecruit.entity;
 
-import com.smartstaff.intellirecruit.enums.ContentType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -35,4 +34,8 @@ public class AiGeneratedContent {
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
+
+    public enum ContentType {
+        BIO, CONTRACT, EMAIL, BLOG_POST, JOB_VACANCY, FILTERED_BIO, FILTERED_VACANCY
+    }
 }

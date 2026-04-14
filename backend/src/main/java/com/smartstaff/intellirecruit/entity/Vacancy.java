@@ -1,6 +1,5 @@
 package com.smartstaff.intellirecruit.entity;
 
-import com.smartstaff.intellirecruit.enums.Status;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -44,4 +43,8 @@ public class Vacancy {
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
+
+    public enum Status {
+        OPEN, CLOSED, DRAFT
+    }
 }
