@@ -26,4 +26,6 @@ public interface CandidateRepository extends JpaRepository<Candidate, Long> {
     @Query("SELECT c FROM Candidate c WHERE c.isAvailable = true " +
             "AND c.experienceYears >= :minYears")
     List<Candidate> findAvailableWithMinExperience(@Param("minYears") int minYears);
+
+    List<Candidate> findByIsAvailableTrue();
 }
