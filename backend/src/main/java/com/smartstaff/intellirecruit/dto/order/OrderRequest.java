@@ -1,5 +1,6 @@
 package com.smartstaff.intellirecruit.dto.order;
 
+import com.smartstaff.intellirecruit.entity.Order;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
@@ -11,5 +12,6 @@ public class OrderRequest {
     private String title;
 
     private String description;
+    private Order.Status status;
     private List<Long> shortlistedCandidates;
 }

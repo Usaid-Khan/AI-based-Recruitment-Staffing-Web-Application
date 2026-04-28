@@ -29,7 +29,7 @@ public class JwtUtil {
                 .header().empty().add("typ", "JWT")
                 .and()
                 .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60))      // 1 hour
+                .expiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24 * 7))      // 7 days
                 .signWith(getSigningKey())
                 .compact();
     }
