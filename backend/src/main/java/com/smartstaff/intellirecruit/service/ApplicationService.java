@@ -122,6 +122,7 @@ public class ApplicationService {
                 .candidateName(a.getCandidate().getUser().getName())
                 .vacancyId(a.getVacancy().getId())
                 .vacancyTitle(a.getVacancy().getTitle())
+                .companyName(a.getVacancy().getEmployer().getCompanyName())
                 .status(a.getStatus())
                 .appliedAt(a.getAppliedAt())
                 .build();

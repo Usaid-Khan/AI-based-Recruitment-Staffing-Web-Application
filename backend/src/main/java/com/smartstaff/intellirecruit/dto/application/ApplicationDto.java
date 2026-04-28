@@ -13,6 +13,7 @@ public class ApplicationDto {
     private Long candidateId;
     private String candidateName;
     private Long vacancyId;
+    private String companyName;
     private String vacancyTitle;
     private Application.Status status;
     private LocalDateTime appliedAt;

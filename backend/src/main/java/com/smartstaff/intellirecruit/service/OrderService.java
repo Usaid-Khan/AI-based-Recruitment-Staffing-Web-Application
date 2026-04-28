@@ -36,7 +36,7 @@ public class OrderService {
                 .employer(employer)
                 .title(request.getTitle())
                 .description(request.getDescription())
-                .status(Order.Status.PENDING)
+                .status(request.getStatus())
                 .shortlistedCandidates(request.getShortlistedCandidates())
                 .build();
 
@@ -82,6 +82,7 @@ public class OrderService {
 
         if (request.getTitle() != null) order.setTitle(request.getTitle());
         if (request.getDescription() != null) order.setDescription(request.getDescription());
+        if (request.getStatus() != null) order.setStatus(request.getStatus());
         if (request.getShortlistedCandidates() != null)
             order.setShortlistedCandidates(request.getShortlistedCandidates());
 
