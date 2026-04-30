@@ -41,6 +41,11 @@ public class GlobalExceptionHandler {
         return buildError(HttpStatus.FORBIDDEN, "You do not have permission to access this resource");
     }
 
+    @ExceptionHandler(AiQuotaExceededException.class)
+    public ResponseEntity<ErrorResponse> handleAiQuotaExceeded(AiQuotaExceededException ex) {
+        return buildError(HttpStatus.TOO_MANY_REQUESTS, ex.getMessage());
+    }
+
     // Handles @Valid validation failures
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, Object>> handleValidation(MethodArgumentNotValidException ex) {
