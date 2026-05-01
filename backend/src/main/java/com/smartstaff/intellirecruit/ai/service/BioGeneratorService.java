@@ -4,6 +4,7 @@ import com.smartstaff.intellirecruit.ai.dto.AiResponse;
 import com.smartstaff.intellirecruit.entity.AiGeneratedContent;
 import com.smartstaff.intellirecruit.entity.Candidate;
 import com.smartstaff.intellirecruit.exception.ResourceNotFoundException;
+import com.smartstaff.intellirecruit.redis.AiCacheService;
 import com.smartstaff.intellirecruit.repository.CandidateRepository;
 import com.smartstaff.intellirecruit.service.AiContentService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,13 +18,30 @@ public class BioGeneratorService {
     private CandidateRepository candidateRepository;
     @Autowired
     private AiContentService aiContentService;
+    @Autowired
+    private AiCacheService aiCacheService;
 
     public AiResponse generateBio(Long candidateId, String customInstructions) {
+        // 1. Check redis cache first
+        String cached = aiCacheService.getCachedResponse("BIO", candidateId);
+        if(cached != null && customInstructions == null) {
+            return AiResponse.builder()
+                    .content(cached)
+                    .type("BIO")
+                    .entityId(candidateId)
+                    .saved(false)       // came from cache, not freshly generated
+                    .build();
+        }
+
+        // 2. Cache miss — call Gemini
         Candidate candidate = candidateRepository.findById(candidateId)
                 .orElseThrow(() -> new ResourceNotFoundException("Candidate", candidateId));
 
         String prompt = buildPrompt(candidate, customInstructions);
         String generateBio = geminiAiService.generate(prompt);
+
+        // 3. Store in Redis cache
+        aiCacheService.cacheResponse("BIO", candidateId, generateBio);
 
         aiContentService.save(
                 AiGeneratedContent.ContentType.BIO,
