@@ -4,7 +4,6 @@ import com.smartstaff.intellirecruit.ai.dto.AiResponse;
 import com.smartstaff.intellirecruit.entity.AiGeneratedContent;
 import com.smartstaff.intellirecruit.entity.Employer;
 import com.smartstaff.intellirecruit.exception.ResourceNotFoundException;
-import com.smartstaff.intellirecruit.redis.AiCacheService;
 import com.smartstaff.intellirecruit.repository.EmployerRepository;
 import com.smartstaff.intellirecruit.service.AiContentService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,30 +17,13 @@ public class VacancyGeneratorService {
     private EmployerRepository employerRepository;
     @Autowired
     private AiContentService aiContentService;
-    @Autowired
-    private AiCacheService aiCacheService;
 
     public AiResponse generateVacancy(Long employerId, String jobTitle, String salaryRange, String experienceLevel, String keySkills, String customInstructions) {
-        // 1. Check redis cache first
-        String cached = aiCacheService.getCachedResponse("JOB_VACANCY", employerId);
-        if(cached != null && customInstructions == null) {
-            return AiResponse.builder()
-                    .content(cached)
-                    .type("JOB_VACANCY")
-                    .entityId(employerId)
-                    .saved(false)       // came from cache, not freshly generated
-                    .build();
-        }
-
-        // 2. Cache miss — call Gemini
         Employer employer = employerRepository.findById(employerId)
                 .orElseThrow(() -> new ResourceNotFoundException("Employer", employerId));
 
         String prompt = buildPrompt(employer, jobTitle, salaryRange, experienceLevel, keySkills, customInstructions);
         String generatedVacancy = geminiAiService.generate(prompt);
-
-        // 3. Store in Redis cache
-        aiCacheService.cacheResponse("JOB_VACANCY", employerId, generatedVacancy);
 
         aiContentService.save(
                 AiGeneratedContent.ContentType.JOB_VACANCY,

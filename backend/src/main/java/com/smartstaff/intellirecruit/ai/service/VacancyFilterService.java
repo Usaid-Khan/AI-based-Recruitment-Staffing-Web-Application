@@ -4,7 +4,6 @@ import com.smartstaff.intellirecruit.ai.dto.AiResponse;
 import com.smartstaff.intellirecruit.entity.AiGeneratedContent;
 import com.smartstaff.intellirecruit.entity.Vacancy;
 import com.smartstaff.intellirecruit.exception.ResourceNotFoundException;
-import com.smartstaff.intellirecruit.redis.AiCacheService;
 import com.smartstaff.intellirecruit.repository.VacancyRepository;
 import com.smartstaff.intellirecruit.service.AiContentService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,30 +17,15 @@ public class VacancyFilterService {
     private VacancyRepository vacancyRepository;
     @Autowired
     private AiContentService aiContentService;
-    @Autowired
-    private AiCacheService aiCacheService;
 
     public AiResponse filterVacancy(Long vacancyId, String agencyPolicies) {
-        // 1. Check redis cache first
-        String cached = aiCacheService.getCachedResponse("FILTERED_VACANCY", vacancyId);
-        if(cached != null && agencyPolicies == null) {
-            return AiResponse.builder()
-                    .content(cached)
-                    .type("FILTERED_VACANCY")
-                    .entityId(vacancyId)
-                    .saved(false)       // came from cache, not freshly generated
-                    .build();
-        }
-
-        // 2. Cache miss — call Gemini
         Vacancy vacancy = vacancyRepository.findById(vacancyId)
                 .orElseThrow(() -> new ResourceNotFoundException("Vacancy", vacancyId));
 
         String prompt = buildPrompt(vacancy, agencyPolicies);
         String filteredVacancy = geminiAiService.generate(prompt);
 
-        // 3. Store in Redis cache
-        aiCacheService.cacheResponse("FILTERED_VACANCY", vacancyId, filteredVacancy);
+
 
         aiContentService.save(
                 AiGeneratedContent.ContentType.FILTERED_VACANCY,

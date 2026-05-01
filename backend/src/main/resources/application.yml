@@ -24,15 +24,6 @@ spring:
             max-output-tokens: 2048
     retry:
       max-attempts: 1
-  redis:
-    host: ${REDIS_HOST}
-    port: ${REDIS_PORT}
-    password: ${REDIS_PASSWORD}
-
-# ----- App-level config -------------------------
-app:
-  redis:
-    ai-cache-ttl: 3600    # cache AI responses for 1 hour (seconds)
 
 #app:
 #  jwt:
