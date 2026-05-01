@@ -14,8 +14,13 @@ import java.util.List;
 @Service
 @Slf4j
 public class GeminiAiService {
+    private final ChatClient chatClient;
+    
     @Autowired
-    private ChatClient.Builder chatClientBuilder;
+    public GeminiAiService(ChatClient.Builder chatClientBuilder) {
+        this.chatClient = chatClientBuilder.build();
+    }
+    
     private static String SYSTEM_PERSONA = "You are an expert HR consultant and professional writer specializing " +
             "in recruitment and staffing. You write clear, professional, and " +
             "compelling content tailored for the recruitment industry. " +
@@ -30,7 +35,6 @@ public class GeminiAiService {
     // Overload — allows custom system prompt per feature
     public String generate(String systemPrompt, String userPrompt) {
         try {
-            ChatClient chatClient = chatClientBuilder.build();
 
             Prompt prompt = new Prompt(List.of(
                     new SystemMessage(systemPrompt),
