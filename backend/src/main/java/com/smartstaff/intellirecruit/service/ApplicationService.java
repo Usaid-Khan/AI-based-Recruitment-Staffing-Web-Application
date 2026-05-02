@@ -1,6 +1,7 @@
 package com.smartstaff.intellirecruit.service;
 
 import com.smartstaff.intellirecruit.dto.application.ApplicationDto;
+import com.smartstaff.intellirecruit.email.EmailService;
 import com.smartstaff.intellirecruit.entity.Application;
 import com.smartstaff.intellirecruit.entity.Candidate;
 import com.smartstaff.intellirecruit.entity.User;
@@ -30,6 +31,8 @@ public class ApplicationService {
     private VacancyRepository vacancyRepository;
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private EmailService emailService;
 
     @Transactional
     public ApplicationDto apply(Long candidateId, Long vacancyId) {
@@ -49,7 +52,16 @@ public class ApplicationService {
                 .status(Application.Status.APPLIED)
                 .build();
 
-        return toDto(applicationRepository.save(application));
+        Application app = applicationRepository.save(application);
+
+        emailService.sendApplicationConfirmation(
+                candidate.getUser().getEmail(),
+                candidate.getUser().getName(),
+                vacancy.getTitle(),
+                vacancy.getEmployer().getCompanyName()
+        );
+
+        return toDto(app);
     }
 
     @Transactional(readOnly = true)
@@ -93,7 +105,17 @@ public class ApplicationService {
         }
 
         application.setStatus(newStatus);
-        return toDto(applicationRepository.save(application));
+
+        Application app = applicationRepository.save(application);
+
+        emailService.sendApplicationStatusUpdate(
+                application.getCandidate().getUser().getEmail(),
+                application.getCandidate().getUser().getName(),
+                application.getVacancy().getTitle(),
+                newStatus.name()
+        );
+
+        return toDto(app);
     }
 
     @Transactional

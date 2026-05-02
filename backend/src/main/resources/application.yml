@@ -29,13 +29,24 @@ spring:
       host: ${REDIS_HOST}
       port: ${REDIS_PORT}
       password: ${REDIS_PASSWORD}
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${GMAIL}
+    password: ${GMAIL_APP_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
 
 #app:
 #  jwt:
 #    secret: 404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970
 #    expiration: 86400000   # 24 hours in milliseconds
 
-# ----- App-level config -------------------------
+# ---------- App-level config -------------------------
 app:
   redis:
     ai-cache-ttl: 3600    # cache AI responses for 1 hour (seconds)

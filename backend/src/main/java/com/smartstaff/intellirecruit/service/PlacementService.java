@@ -2,6 +2,7 @@ package com.smartstaff.intellirecruit.service;
 
 import com.smartstaff.intellirecruit.dto.placement.PlacementDto;
 import com.smartstaff.intellirecruit.dto.placement.PlacementRequest;
+import com.smartstaff.intellirecruit.email.EmailService;
 import com.smartstaff.intellirecruit.entity.Candidate;
 import com.smartstaff.intellirecruit.entity.Employer;
 import com.smartstaff.intellirecruit.entity.Placement;
@@ -28,6 +29,8 @@ public class PlacementService {
     private EmployerRepository employerRepository;
     @Autowired
     private VacancyRepository vacancyRepository;
+    @Autowired
+    private EmailService emailService;
 
     @Transactional
     public PlacementDto create(PlacementRequest request) {
@@ -55,7 +58,17 @@ public class PlacementService {
         candidate.setIsAvailable(false);
         candidateRepository.save(candidate);
 
-        return toDto(placementRepository.save(placement));
+        Placement job = placementRepository.save(placement);
+
+        emailService.sendPlacementNotification(
+                candidate.getUser().getEmail(),
+                candidate.getUser().getName(),
+                employer.getCompanyName(),
+                vacancy != null ? vacancy.getTitle() : "New Position",
+                request.getStartDate() != null ? request.getStartDate().toString() : "To be confirmed"
+        );
+
+        return toDto(job);
     }
 
     @Transactional(readOnly = true)
