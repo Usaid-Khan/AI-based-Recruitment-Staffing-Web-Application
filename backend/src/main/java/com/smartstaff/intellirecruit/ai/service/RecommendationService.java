@@ -4,10 +4,13 @@ import com.smartstaff.intellirecruit.ai.dto.RecommendationResponse;
 import com.smartstaff.intellirecruit.entity.Candidate;
 import com.smartstaff.intellirecruit.entity.Vacancy;
 import com.smartstaff.intellirecruit.exception.ResourceNotFoundException;
+import com.smartstaff.intellirecruit.kafka.event.AiEventBuilder;
+import com.smartstaff.intellirecruit.kafka.producer.AiEventProducer;
 import com.smartstaff.intellirecruit.repository.CandidateRepository;
 import com.smartstaff.intellirecruit.repository.VacancyRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import tools.jackson.databind.ObjectMapper;
 
@@ -26,6 +29,8 @@ public class RecommendationService {
     private CandidateRepository candidateRepository;
     @Autowired
     private ObjectMapper objectMapper;
+    @Autowired
+    private AiEventProducer aiEventProducer;
 
     public RecommendationResponse recommendCandidates(Long vacancyId, Integer minExperience) {
         Vacancy vacancy = vacancyRepository.findById(vacancyId)
@@ -46,6 +51,19 @@ public class RecommendationService {
 
         String prompt = buildPrompt(vacancy, candidates);
         String rawResponse = geminiAiService.generate(prompt);
+
+        String triggeredBy = SecurityContextHolder.getContext()
+                .getAuthentication().getName();
+
+        // Save the full recommendation JSON as AI content
+        aiEventProducer.publishAiGeneratedEvent(
+                AiEventBuilder.buildSilent(
+                        "BIO",   // reuse BIO type or add RECOMMENDATION to your enum
+                        vacancyId,
+                        rawResponse,
+                        triggeredBy
+                )
+        );
 
         return parseResponse(rawResponse, vacancy, candidates);
     }

@@ -4,10 +4,13 @@ import com.smartstaff.intellirecruit.ai.dto.AiResponse;
 import com.smartstaff.intellirecruit.entity.AiGeneratedContent;
 import com.smartstaff.intellirecruit.entity.Candidate;
 import com.smartstaff.intellirecruit.exception.ResourceNotFoundException;
+import com.smartstaff.intellirecruit.kafka.event.AiEventBuilder;
+import com.smartstaff.intellirecruit.kafka.producer.AiEventProducer;
 import com.smartstaff.intellirecruit.redis.AiCacheService;
 import com.smartstaff.intellirecruit.repository.CandidateRepository;
 import com.smartstaff.intellirecruit.service.AiContentService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -20,6 +23,8 @@ public class BioGeneratorService {
     private AiContentService aiContentService;
     @Autowired
     private AiCacheService aiCacheService;
+    @Autowired
+    private AiEventProducer aiEventProducer;
 
     public AiResponse generateBio(Long candidateId, String customInstructions) {
         // 1. Check Redis cache first
@@ -43,11 +48,28 @@ public class BioGeneratorService {
         // 3. Store in Redis cache
         aiCacheService.cacheResponse("BIO", candidateId, generatedBio);
 
-        aiContentService.save(
-                AiGeneratedContent.ContentType.BIO,
-                generatedBio,
-                candidateId
+        // 5. Get current logged-in user email
+        String triggeredBy = SecurityContextHolder.getContext()
+                .getAuthentication().getName();
+
+        // 6. Publish to Kafka — consumer will save to DB + send email
+        //    If Kafka is down, fallback handles it synchronously
+        aiEventProducer.publishAiGeneratedEvent(
+                AiEventBuilder.build(
+                        "BIO",
+                        candidateId,
+                        generatedBio,
+                        triggeredBy,
+                        candidate.getUser().getEmail(),   // notify candidate
+                        candidate.getUser().getName()
+                )
         );
+
+//        aiContentService.save(
+//                AiGeneratedContent.ContentType.BIO,
+//                generatedBio,
+//                candidateId
+//        );
 
         return AiResponse.builder()
                 .content(generatedBio)

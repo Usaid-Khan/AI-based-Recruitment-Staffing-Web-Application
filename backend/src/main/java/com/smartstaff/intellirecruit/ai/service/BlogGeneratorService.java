@@ -3,8 +3,11 @@ package com.smartstaff.intellirecruit.ai.service;
 import com.smartstaff.intellirecruit.ai.dto.AiResponse;
 import com.smartstaff.intellirecruit.ai.dto.BlogRequest;
 import com.smartstaff.intellirecruit.entity.AiGeneratedContent;
+import com.smartstaff.intellirecruit.kafka.event.AiEventBuilder;
+import com.smartstaff.intellirecruit.kafka.producer.AiEventProducer;
 import com.smartstaff.intellirecruit.service.AiContentService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -13,16 +16,30 @@ public class BlogGeneratorService {
     private GeminiAiService geminiAiService;
     @Autowired
     private AiContentService aiContentService;
+    @Autowired
+    private AiEventProducer aiEventProducer;
 
     public AiResponse generateBlogPost(BlogRequest request) {
         String prompt = buildPrompt(request);
         String generatedPost = geminiAiService.generate(prompt);
 
-        aiContentService.save(
-                AiGeneratedContent.ContentType.BLOG_POST,
-                generatedPost,
-                null
+        String triggeredBy = SecurityContextHolder.getContext()
+                .getAuthentication().getName();
+
+        aiEventProducer.publishAiGeneratedEvent(
+                AiEventBuilder.buildSilent(
+                        "BLOG_POST",
+                        null,
+                        generatedPost,
+                        triggeredBy
+                )
         );
+
+//        aiContentService.save(
+//                AiGeneratedContent.ContentType.BLOG_POST,
+//                generatedPost,
+//                null
+//        );
 
         return AiResponse.builder()
                 .content(generatedPost)

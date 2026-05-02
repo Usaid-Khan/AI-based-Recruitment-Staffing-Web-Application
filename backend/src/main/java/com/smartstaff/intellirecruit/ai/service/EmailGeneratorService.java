@@ -3,8 +3,11 @@ package com.smartstaff.intellirecruit.ai.service;
 import com.smartstaff.intellirecruit.ai.dto.AiResponse;
 import com.smartstaff.intellirecruit.ai.dto.EmailRequest;
 import com.smartstaff.intellirecruit.entity.AiGeneratedContent;
+import com.smartstaff.intellirecruit.kafka.event.AiEventBuilder;
+import com.smartstaff.intellirecruit.kafka.producer.AiEventProducer;
 import com.smartstaff.intellirecruit.service.AiContentService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -13,16 +16,31 @@ public class EmailGeneratorService {
     private GeminiAiService geminiAiService;
     @Autowired
     private AiContentService aiContentService;
+    @Autowired
+    private AiEventProducer aiEventProducer;
 
     public AiResponse generateEmail(EmailRequest request) {
         String prompt = buildPrompt(request);
         String generatedEmail = geminiAiService.generate(prompt);
 
-        aiContentService.save(
-                AiGeneratedContent.ContentType.EMAIL,
-                generatedEmail,
-                null // no specific entity linked to emails
+        String triggeredBy = SecurityContextHolder.getContext()
+                .getAuthentication().getName();
+
+        // No entity ID or recipient for generic email templates
+        aiEventProducer.publishAiGeneratedEvent(
+                AiEventBuilder.buildSilent(
+                        "EMAIL",
+                        null,
+                        generatedEmail,
+                        triggeredBy
+                )
         );
+
+//        aiContentService.save(
+//                AiGeneratedContent.ContentType.EMAIL,
+//                generatedEmail,
+//                null // no specific entity linked to emails
+//        );
 
         return AiResponse.builder()
                 .content(generatedEmail)
