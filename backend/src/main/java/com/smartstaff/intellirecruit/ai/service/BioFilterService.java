@@ -4,10 +4,13 @@ import com.smartstaff.intellirecruit.ai.dto.AiResponse;
 import com.smartstaff.intellirecruit.entity.AiGeneratedContent;
 import com.smartstaff.intellirecruit.entity.Candidate;
 import com.smartstaff.intellirecruit.exception.ResourceNotFoundException;
+import com.smartstaff.intellirecruit.kafka.event.AiEventBuilder;
+import com.smartstaff.intellirecruit.kafka.producer.AiEventProducer;
 import com.smartstaff.intellirecruit.redis.AiCacheService;
 import com.smartstaff.intellirecruit.repository.CandidateRepository;
 import com.smartstaff.intellirecruit.service.AiContentService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -20,6 +23,8 @@ public class BioFilterService {
     private AiContentService aiContentService;
     @Autowired
     private AiCacheService aiCacheService;
+    @Autowired
+    private AiEventProducer aiEventProducer;
 
     public AiResponse filterBio(Long candidateId, String agencyPolicies) {
         // 1. Check Redis cache first
@@ -47,11 +52,25 @@ public class BioFilterService {
         // 3. Store in Redis cache
         aiCacheService.cacheResponse("FILTERED_BIO", candidateId, filteredBio);
 
-        aiContentService.save(
-                AiGeneratedContent.ContentType.FILTERED_BIO,
-                filteredBio,
-                candidateId
+        // Get current logged-in user
+        String triggeredBy = SecurityContextHolder.getContext()
+                .getAuthentication().getName();
+
+        // Publish to Kafka — no email notification for filter operations
+        aiEventProducer.publishAiGeneratedEvent(
+                AiEventBuilder.buildSilent(
+                        "FILTERED_BIO",
+                        candidateId,
+                        filteredBio,
+                        triggeredBy
+                )
         );
+
+//        aiContentService.save(
+//                AiGeneratedContent.ContentType.FILTERED_BIO,
+//                filteredBio,
+//                candidateId
+//        );
 
         return AiResponse.builder()
                 .content(filteredBio)

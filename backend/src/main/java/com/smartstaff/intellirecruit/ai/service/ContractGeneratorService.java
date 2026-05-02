@@ -7,11 +7,14 @@ import com.smartstaff.intellirecruit.entity.Candidate;
 import com.smartstaff.intellirecruit.entity.Employer;
 import com.smartstaff.intellirecruit.entity.Vacancy;
 import com.smartstaff.intellirecruit.exception.ResourceNotFoundException;
+import com.smartstaff.intellirecruit.kafka.event.AiEventBuilder;
+import com.smartstaff.intellirecruit.kafka.producer.AiEventProducer;
 import com.smartstaff.intellirecruit.repository.CandidateRepository;
 import com.smartstaff.intellirecruit.repository.EmployerRepository;
 import com.smartstaff.intellirecruit.repository.VacancyRepository;
 import com.smartstaff.intellirecruit.service.AiContentService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -28,6 +31,8 @@ public class ContractGeneratorService {
     private VacancyRepository vacancyRepository;
     @Autowired
     private AiContentService aiContentService;
+    @Autowired
+    private AiEventProducer aiEventProducer;
 
     public AiResponse generateContract(ContractRequest request) {
         Candidate candidate = candidateRepository.findById(request.getCandidateId())
@@ -45,11 +50,26 @@ public class ContractGeneratorService {
         String prompt = buildPrompt(candidate, employer, vacancy, request);
         String generatedContract = geminiAiService.generate(prompt);
 
-        aiContentService.save(
-                AiGeneratedContent.ContentType.CONTRACT,
-                generatedContract,
-                request.getCandidateId()
+        String triggeredBy = SecurityContextHolder.getContext()
+                .getAuthentication().getName();
+
+        // Notify both candidate and employer — send to candidate
+        aiEventProducer.publishAiGeneratedEvent(
+                AiEventBuilder.build(
+                        "CONTRACT",
+                        request.getCandidateId(),
+                        generatedContract,
+                        triggeredBy,
+                        candidate.getUser().getEmail(),
+                        candidate.getUser().getName()
+                )
         );
+
+//        aiContentService.save(
+//                AiGeneratedContent.ContentType.CONTRACT,
+//                generatedContract,
+//                request.getCandidateId()
+//        );
 
         return AiResponse.builder()
                 .content(generatedContract)

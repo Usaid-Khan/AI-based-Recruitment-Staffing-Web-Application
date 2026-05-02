@@ -4,10 +4,13 @@ import com.smartstaff.intellirecruit.ai.dto.AiResponse;
 import com.smartstaff.intellirecruit.entity.AiGeneratedContent;
 import com.smartstaff.intellirecruit.entity.Employer;
 import com.smartstaff.intellirecruit.exception.ResourceNotFoundException;
+import com.smartstaff.intellirecruit.kafka.event.AiEventBuilder;
+import com.smartstaff.intellirecruit.kafka.producer.AiEventProducer;
 import com.smartstaff.intellirecruit.redis.AiCacheService;
 import com.smartstaff.intellirecruit.repository.EmployerRepository;
 import com.smartstaff.intellirecruit.service.AiContentService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -20,6 +23,8 @@ public class VacancyGeneratorService {
     private AiContentService aiContentService;
     @Autowired
     private AiCacheService aiCacheService;
+    @Autowired
+    private AiEventProducer aiEventProducer;
 
     public AiResponse generateVacancy(Long employerId, String jobTitle, String salaryRange, String experienceLevel, String keySkills, String customInstructions) {
         // 1. Check Redis cache first
@@ -43,11 +48,23 @@ public class VacancyGeneratorService {
         // 3. Store in Redis cache
         aiCacheService.cacheResponse("JOB_VACANCY", employerId, generatedVacancy);
 
-        aiContentService.save(
-                AiGeneratedContent.ContentType.JOB_VACANCY,
-                generatedVacancy,
-                employerId
+        String triggeredBy = SecurityContextHolder.getContext()
+                .getAuthentication().getName();
+
+        aiEventProducer.publishAiGeneratedEvent(
+                AiEventBuilder.buildSilent(
+                        "JOB_VACANCY",
+                        employerId,
+                        generatedVacancy,
+                        triggeredBy
+                )
         );
+
+//        aiContentService.save(
+//                AiGeneratedContent.ContentType.JOB_VACANCY,
+//                generatedVacancy,
+//                employerId
+//        );
 
         return AiResponse.builder()
                 .content(generatedVacancy)
