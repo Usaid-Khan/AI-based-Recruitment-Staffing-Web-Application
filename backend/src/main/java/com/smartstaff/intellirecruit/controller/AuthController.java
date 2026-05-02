@@ -3,6 +3,7 @@ package com.smartstaff.intellirecruit.controller;
 import com.smartstaff.intellirecruit.dto.AuthResponse;
 import com.smartstaff.intellirecruit.dto.LoginRequest;
 import com.smartstaff.intellirecruit.dto.RegisterRequest;
+import com.smartstaff.intellirecruit.email.EmailService;
 import com.smartstaff.intellirecruit.entity.User;
 import com.smartstaff.intellirecruit.repository.UserRepository;
 import com.smartstaff.intellirecruit.utils.JwtUtil;
@@ -31,6 +32,8 @@ public class AuthController {
     private static final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
     @Autowired
     private JwtUtil jwtUtil;
+    @Autowired
+    private EmailService emailService;
 
     @PostMapping("/register")
     public ResponseEntity<AuthResponse> register(@Valid @RequestBody RegisterRequest request) {
@@ -47,6 +50,12 @@ public class AuthController {
                 .build();
 
         userRepository.save(user);
+
+        emailService.sendWelcomeEmail(
+                user.getEmail(),
+                user.getName(),
+                user.getRole().name()
+        );
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
