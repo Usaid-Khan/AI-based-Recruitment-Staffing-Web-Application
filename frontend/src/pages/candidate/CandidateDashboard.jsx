@@ -2,6 +2,20 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import authService from '../../services/authService';
 import candidateService from '../../services/candidateService';
+import { 
+  LayoutDashboard, 
+  User, 
+  FileText, 
+  Search, 
+  Briefcase, 
+  LogOut,
+  ClipboardList,
+  Star,
+  Clock,
+  CheckCircle,
+  TrendingUp,
+  Sparkles
+} from 'lucide-react';
 import './CandidateDashboard.css';
 
 const CandidateDashboard = () => {
@@ -42,10 +56,10 @@ const CandidateDashboard = () => {
   }
 
   const stats = [
-    { label: 'Total Applications', value: applications.length, icon: '📝', trend: 'Active tracking' },
-    { label: 'Shortlisted', value: applications.filter(a => a.status === 'SHORTLISTED').length, icon: '⭐', trend: 'Keep it up!' },
-    { label: 'Experience', value: `${profile?.experienceYears || 0} yrs`, icon: '⏳', trend: 'In your field' },
-    { label: 'Profile Status', value: profile?.isAvailable ? 'Available' : 'Busy', icon: '👤', trend: 'Visibility' },
+    { label: 'Total Applications', value: applications.length, icon: <ClipboardList size={24} />, trend: 'Active tracking' },
+    { label: 'Shortlisted', value: applications.filter(a => a.status === 'SHORTLISTED').length, icon: <Star size={24} />, trend: 'Keep it up!' },
+    { label: 'Experience', value: `${profile?.experienceYears || 0} yrs`, icon: <Clock size={24} />, trend: 'In your field' },
+    { label: 'Profile Status', value: profile?.isAvailable ? 'Available' : 'Busy', icon: <CheckCircle size={24} />, trend: 'Visibility' },
   ];
 
   return (
@@ -61,30 +75,30 @@ const CandidateDashboard = () => {
         
         <nav className="sidebar-nav">
           <Link to="/candidate/dashboard" className="nav-item nav-item--active">
-            <span className="nav-icon">📊</span>
+            <LayoutDashboard size={20} className="nav-icon" />
             Dashboard
           </Link>
           <Link to="/candidate/profile" className="nav-item">
-            <span className="nav-icon">👤</span>
+            <User size={20} className="nav-icon" />
             My Profile
           </Link>
           <Link to="/candidate/applications" className="nav-item">
-            <span className="nav-icon">📁</span>
+            <FileText size={20} className="nav-icon" />
             Applications
           </Link>
           <Link to="/candidate/vacancies" className="nav-item">
-            <span className="nav-icon">🔍</span>
+            <Search size={20} className="nav-icon" />
             Browse Jobs
           </Link>
           <Link to="/candidate/contracts" className="nav-item">
-            <span className="nav-icon">📄</span>
+            <Briefcase size={20} className="nav-icon" />
             My Contracts
           </Link>
         </nav>
 
         <div className="sidebar-footer">
           <button className="btn-logout" onClick={handleLogout}>
-            <span className="nav-icon">⏻</span>
+            <LogOut size={20} className="nav-icon" />
             Logout
           </button>
         </div>
@@ -120,8 +134,11 @@ const CandidateDashboard = () => {
             {stats.map((s, idx) => (
               <div key={idx} className="stat-card">
                 <div className="stat-header">
-                  <div className="stat-icon">{s.icon}</div>
-                  <div className="stat-trend trend-up">{s.trend}</div>
+                  <div className="stat-icon" style={{color: 'var(--c-gold)'}}>{s.icon}</div>
+                  <div className="stat-trend trend-up">
+                    <TrendingUp size={12} style={{marginRight: '4px'}} />
+                    {s.trend}
+                  </div>
                 </div>
                 <div className="stat-value">{s.value}</div>
                 <div className="stat-label">{s.label}</div>
@@ -176,15 +193,21 @@ const CandidateDashboard = () => {
                   </div>
                   <div className="profile-tips">
                     <div className="tip-item">
-                      <span className="tip-check" style={{color: profile?.bio ? 'var(--c-gold)' : 'var(--c-text-dim)'}}>{profile?.bio ? '✓' : '○'}</span>
+                      <span className="tip-check" style={{color: profile?.bio ? 'var(--c-gold)' : 'var(--c-text-dim)'}}>
+                        <CheckCircle size={14} />
+                      </span>
                       <span>Professional bio generated</span>
                     </div>
                     <div className="tip-item">
-                      <span className="tip-check" style={{color: profile?.resumeUrl ? 'var(--c-gold)' : 'var(--c-text-dim)'}}>{profile?.resumeUrl ? '✓' : '○'}</span>
+                      <span className="tip-check" style={{color: profile?.resumeUrl ? 'var(--c-gold)' : 'var(--c-text-dim)'}}>
+                        <CheckCircle size={14} />
+                      </span>
                       <span>Resume uploaded</span>
                     </div>
                     <div className="tip-item">
-                      <span className="tip-check" style={{color: profile?.skills ? 'var(--c-gold)' : 'var(--c-text-dim)'}}>{profile?.skills ? '✓' : '○'}</span>
+                      <span className="tip-check" style={{color: profile?.skills ? 'var(--c-gold)' : 'var(--c-text-dim)'}}>
+                        <CheckCircle size={14} />
+                      </span>
                       <span>Skills added</span>
                     </div>
                   </div>
@@ -194,12 +217,18 @@ const CandidateDashboard = () => {
                 </div>
               </section>
 
-              <section className="section-card" style={{background: 'linear-gradient(145deg, var(--c-surface), var(--c-gold-dim))', borderColor: 'rgba(201,168,76,0.3)'}}>
-                 <h3 style={{fontFamily: 'var(--font-display)', fontSize: '18px', marginBottom: '12px', color: 'var(--c-gold)'}}>AI Job Matching</h3>
-                 <p style={{fontSize: '13px', color: 'var(--c-text-muted)', lineHeight: '1.6', marginBottom: '16px'}}>
+              <section className="section-card" style={{background: 'linear-gradient(145deg, var(--c-surface), var(--c-gold-dim))', borderColor: 'rgba(201,168,76,0.3)', position: 'relative', overflow: 'hidden'}}>
+                 <div style={{position: 'absolute', top: '-10px', right: '-10px', opacity: 0.05}}>
+                    <Sparkles size={100} color="var(--c-gold)" />
+                 </div>
+                 <h3 style={{fontFamily: 'var(--font-display)', fontSize: '18px', marginBottom: '12px', color: 'var(--c-gold)', display: 'flex', alignItems: 'center', gap: '8px'}}>
+                   <Sparkles size={20} />
+                   AI Job Matching
+                 </h3>
+                 <p style={{fontSize: '13px', color: 'var(--c-text-muted)', lineHeight: '1.6', marginBottom: '16px', position: 'relative', zIndex: 1}}>
                    Our Gemini AI analyzes your skills ({profile?.skills || 'Not added yet'}) to find the best opportunities for you.
                  </p>
-                 <button className="btn-text" style={{padding: '0'}} onClick={() => navigate('/candidate/vacancies')}>Explore Matches →</button>
+                 <button className="btn-text" style={{padding: '0', position: 'relative', zIndex: 1}} onClick={() => navigate('/candidate/vacancies')}>Explore Matches →</button>
               </section>
             </div>
           </div>

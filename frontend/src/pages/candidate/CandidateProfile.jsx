@@ -2,6 +2,21 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import authService from '../../services/authService';
 import candidateService from '../../services/candidateService';
+import { 
+  LayoutDashboard, 
+  User, 
+  FileText, 
+  Search, 
+  Briefcase, 
+  LogOut,
+  Sparkles,
+  CheckCircle,
+  AlertCircle,
+  Upload,
+  ArrowRight,
+  TrendingUp,
+  FileDown
+} from 'lucide-react';
 import './CandidateProfile.css';
 
 const CandidateProfile = () => {
@@ -81,7 +96,6 @@ const CandidateProfile = () => {
     try {
       await candidateService.updateProfile(profile.id, formData);
       setMessage({ text: 'Profile updated successfully!', type: 'success' });
-      // Refresh local data
       fetchProfile();
     } catch (err) {
       setMessage({ text: err.response?.data?.message || 'Failed to update profile.', type: 'error' });
@@ -134,32 +148,32 @@ const CandidateProfile = () => {
           </Link>
         </div>
         
-        <nav className="sidebar-nav">
-          <Link to="/candidate/dashboard" className="nav-item">
-            <span className="nav-icon">📊</span>
+        <nav className="sidebar-nav" style={{flex: 1, padding: '0 16px'}}>
+          <Link to="/candidate/dashboard" className="nav-item" style={{display: 'flex', alignItems: 'center', gap: '12px', padding: '12px 16px', borderRadius: '8px', color: 'var(--c-text-muted)', textDecoration: 'none', transition: 'var(--transition)', marginBottom: '4px'}}>
+            <LayoutDashboard size={20} />
             Dashboard
           </Link>
-          <Link to="/candidate/profile" className="nav-item nav-item--active">
-            <span className="nav-icon">👤</span>
+          <Link to="/candidate/profile" className="nav-item nav-item--active" style={{display: 'flex', alignItems: 'center', gap: '12px', padding: '12px 16px', borderRadius: '8px', color: 'var(--c-gold)', backgroundColor: 'var(--c-gold-dim)', textDecoration: 'none', fontWeight: '600', marginBottom: '4px'}}>
+            <User size={20} />
             My Profile
           </Link>
-          <Link to="/candidate/applications" className="nav-item">
-            <span className="nav-icon">📁</span>
+          <Link to="/candidate/applications" className="nav-item" style={{display: 'flex', alignItems: 'center', gap: '12px', padding: '12px 16px', borderRadius: '8px', color: 'var(--c-text-muted)', textDecoration: 'none', transition: 'var(--transition)', marginBottom: '4px'}}>
+            <FileText size={20} />
             Applications
           </Link>
-          <Link to="/candidate/vacancies" className="nav-item">
-            <span className="nav-icon">🔍</span>
+          <Link to="/candidate/vacancies" className="nav-item" style={{display: 'flex', alignItems: 'center', gap: '12px', padding: '12px 16px', borderRadius: '8px', color: 'var(--c-text-muted)', textDecoration: 'none', transition: 'var(--transition)', marginBottom: '4px'}}>
+            <Search size={20} />
             Browse Jobs
           </Link>
-          <Link to="/candidate/contracts" className="nav-item">
-            <span className="nav-icon">📄</span>
+          <Link to="/candidate/contracts" className="nav-item" style={{display: 'flex', alignItems: 'center', gap: '12px', padding: '12px 16px', borderRadius: '8px', color: 'var(--c-text-muted)', textDecoration: 'none', transition: 'var(--transition)', marginBottom: '4px'}}>
+            <Briefcase size={20} />
             My Contracts
           </Link>
         </nav>
 
-        <div className="sidebar-footer">
-          <button className="btn-logout" onClick={handleLogout}>
-            <span className="nav-icon">⏻</span>
+        <div className="sidebar-footer" style={{padding: '24px', borderTop: '1px solid var(--c-border)'}}>
+          <button className="btn-logout" onClick={handleLogout} style={{width: '100%', display: 'flex', alignItems: 'center', gap: '12px', padding: '12px 16px', borderRadius: '8px', color: '#f87171', background: 'rgba(239, 68, 68, 0.05)', border: '1px solid rgba(239, 68, 68, 0.1)', cursor: 'pointer', transition: 'var(--transition)', fontWeight: '600'}}>
+            <LogOut size={18} />
             Logout
           </button>
         </div>
@@ -179,7 +193,9 @@ const CandidateProfile = () => {
 
         {message.text && (
           <div className={`auth-error ${message.type === 'success' ? 'auth-success' : ''}`} style={{marginBottom: '24px', backgroundColor: message.type === 'success' ? 'rgba(34,197,94,0.1)' : 'rgba(239,68,68,0.1)', borderColor: message.type === 'success' ? '#22c55e' : '#ef4444', color: message.type === 'success' ? '#22c55e' : '#ef4444'}}>
-            <span className="auth-error-icon">{message.type === 'success' ? '✓' : '⚠'}</span>
+            <span className="auth-error-icon">
+              {message.type === 'success' ? <CheckCircle size={18} /> : <AlertCircle size={18} />}
+            </span>
             {message.text}
           </div>
         )}
@@ -189,7 +205,7 @@ const CandidateProfile = () => {
           <div className="profile-main-col">
             <section className="profile-section">
               <div className="section-title">
-                <span>📝</span> Professional Bio
+                <FileText size={18} /> Professional Bio
               </div>
               <div className="form-group">
                 <label>Tell employers about yourself</label>
@@ -205,7 +221,7 @@ const CandidateProfile = () => {
 
             <section className="profile-section">
               <div className="section-title">
-                <span>🛠</span> Skills & Expertise
+                <Briefcase size={18} /> Skills & Expertise
               </div>
               <div className="form-group">
                 <label>Add skills (Press Enter)</label>
@@ -231,7 +247,7 @@ const CandidateProfile = () => {
 
             <button type="submit" className="btn-save" disabled={saving}>
               {saving ? 'Saving...' : 'Save Changes'}
-              {!saving && <span>→</span>}
+              {!saving && <ArrowRight size={18} style={{marginLeft: '8px'}} />}
             </button>
           </div>
 
@@ -239,7 +255,7 @@ const CandidateProfile = () => {
           <div className="profile-side-col">
             <section className="profile-section">
               <div className="section-title">
-                <span>⚡</span> Availability
+                <Sparkles size={18} /> Visibility
               </div>
               <div className="availability-toggle">
                 <div className="status-indicator">
@@ -256,14 +272,18 @@ const CandidateProfile = () => {
                   <span className="slider"></span>
                 </label>
               </div>
-              <p style={{fontSize: '12px', color: 'var(--c-text-dim)', marginTop: '12px', lineHeight: '1.4'}}>
-                Toggling this off will hide your profile from employer searches.
-              </p>
+              <div className={`bio-status ${profile?.bio ? 'bio-status--active' : ''}`} style={{display: 'flex', alignItems: 'center', gap: '8px', marginTop: '16px', fontSize: '12px'}}>
+                {profile?.bio ? (
+                  <><CheckCircle size={14} color="var(--c-gold)" /> AI Bio Active</>
+                ) : (
+                  <><AlertCircle size={14} /> Bio Not Generated</>
+                )}
+              </div>
             </section>
 
             <section className="profile-section">
               <div className="section-title">
-                <span>📈</span> Experience
+                <TrendingUp size={18} /> Experience
               </div>
               <div className="form-group">
                 <label>Years of Experience</label>
@@ -281,19 +301,24 @@ const CandidateProfile = () => {
 
             <section className="profile-section">
               <div className="section-title">
-                <span>📄</span> Resume / CV
+                <FileText size={18} /> Resume / CV
               </div>
-              {profile?.resumeUrl ? (
+              {profile?.resumeUrl && (
                 <div style={{marginBottom: '16px'}}>
-                  <div className="skill-tag" style={{width: '100%', justifyContent: 'space-between', borderRadius: '8px'}}>
-                    <span>📄 Resume Uploaded</span>
-                    <a href={profile.resumeUrl} target="_blank" rel="noreferrer" style={{color: 'var(--c-gold)', fontSize: '12px'}}>View</a>
+                  <div className="skill-tag" style={{width: '100%', justifyContent: 'space-between', borderRadius: '8px', padding: '10px'}}>
+                    <div style={{display: 'flex', alignItems: 'center', gap: '8px'}}>
+                      <FileDown size={14} color="var(--c-gold)" />
+                      <span style={{fontSize: '12px'}}>Resume Uploaded</span>
+                    </div>
+                    <a href={profile.resumeUrl} target="_blank" rel="noreferrer" style={{color: 'var(--c-gold)', fontSize: '12px', fontWeight: '600', textDecoration: 'none'}}>View</a>
                   </div>
                 </div>
-              ) : null}
+              )}
               <div className="resume-box">
                 <input type="file" accept=".pdf,.doc,.docx" onChange={handleResumeUpload} />
-                <div className="resume-icon">📤</div>
+                <div className="resume-icon">
+                  <Upload size={24} />
+                </div>
                 <div className="resume-info">
                   <h4>{profile?.resumeUrl ? 'Update Resume' : 'Upload Resume'}</h4>
                   <p>PDF or Word (Max 5MB)</p>

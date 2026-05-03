@@ -1,8 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import ReactMarkdown from 'react-markdown';
 import authService from '../../services/authService';
 import vacancyService from '../../services/vacancyService';
 import candidateService from '../../services/candidateService';
+import { 
+  LayoutDashboard, 
+  User, 
+  FileText, 
+  Search, 
+  Briefcase, 
+  LogOut,
+  Building,
+  DollarSign,
+  MapPin,
+  X
+} from 'lucide-react';
 import './BrowseVacancies.css';
 
 const BrowseVacancies = () => {
@@ -94,30 +107,30 @@ const BrowseVacancies = () => {
         
         <nav className="sidebar-nav" style={{flex: 1, padding: '0 16px'}}>
           <Link to="/candidate/dashboard" className="nav-item" style={{display: 'flex', alignItems: 'center', gap: '12px', padding: '12px 16px', borderRadius: '8px', color: 'var(--c-text-muted)', textDecoration: 'none', transition: 'var(--transition)', marginBottom: '4px'}}>
-            <span className="nav-icon">📊</span>
+            <LayoutDashboard size={20} />
             Dashboard
           </Link>
           <Link to="/candidate/profile" className="nav-item" style={{display: 'flex', alignItems: 'center', gap: '12px', padding: '12px 16px', borderRadius: '8px', color: 'var(--c-text-muted)', textDecoration: 'none', transition: 'var(--transition)', marginBottom: '4px'}}>
-            <span className="nav-icon">👤</span>
+            <User size={20} />
             My Profile
           </Link>
           <Link to="/candidate/applications" className="nav-item" style={{display: 'flex', alignItems: 'center', gap: '12px', padding: '12px 16px', borderRadius: '8px', color: 'var(--c-text-muted)', textDecoration: 'none', transition: 'var(--transition)', marginBottom: '4px'}}>
-            <span className="nav-icon">📁</span>
+            <FileText size={20} />
             Applications
           </Link>
           <Link to="/candidate/vacancies" className="nav-item nav-item--active" style={{display: 'flex', alignItems: 'center', gap: '12px', padding: '12px 16px', borderRadius: '8px', color: 'var(--c-gold)', backgroundColor: 'var(--c-gold-dim)', textDecoration: 'none', fontWeight: '600', marginBottom: '4px'}}>
-            <span className="nav-icon">🔍</span>
+            <Search size={20} />
             Browse Jobs
           </Link>
           <Link to="/candidate/contracts" className="nav-item" style={{display: 'flex', alignItems: 'center', gap: '12px', padding: '12px 16px', borderRadius: '8px', color: 'var(--c-text-muted)', textDecoration: 'none', transition: 'var(--transition)', marginBottom: '4px'}}>
-            <span className="nav-icon">📄</span>
+            <Briefcase size={20} />
             My Contracts
           </Link>
         </nav>
 
         <div className="sidebar-footer" style={{padding: '24px', borderTop: '1px solid var(--c-border)'}}>
           <button className="btn-logout" onClick={handleLogout} style={{width: '100%', display: 'flex', alignItems: 'center', gap: '12px', padding: '12px 16px', borderRadius: '8px', color: '#f87171', background: 'rgba(239, 68, 68, 0.05)', border: '1px solid rgba(239, 68, 68, 0.1)', cursor: 'pointer', transition: 'var(--transition)', fontWeight: '600'}}>
-            <span className="nav-icon">⏻</span>
+            <LogOut size={18} />
             Logout
           </button>
         </div>
@@ -134,7 +147,7 @@ const BrowseVacancies = () => {
 
         <form className="search-container" onSubmit={handleSearch}>
           <div className="search-input-wrap">
-            <span className="search-input-icon">🔍</span>
+            <Search size={20} className="search-input-icon" />
             <input 
               type="text" 
               className="search-input" 
@@ -161,11 +174,11 @@ const BrowseVacancies = () => {
               </div>
               <h3 className="vacancy-title">{vacancy.title}</h3>
               <div className="vacancy-company">
-                <span>🏢</span> {vacancy.companyName}
+                <Building size={14} /> {vacancy.companyName}
               </div>
-              <p className="vacancy-description">
-                {vacancy.description}
-              </p>
+              <div className="vacancy-description">
+                <ReactMarkdown>{vacancy.description}</ReactMarkdown>
+              </div>
               <div className="vacancy-requirements">
                 {vacancy.requirements?.split(',').slice(0, 3).map((req, i) => (
                   <span key={i} className="req-tag">{req.trim()}</span>
@@ -200,25 +213,29 @@ const BrowseVacancies = () => {
       {selectedVacancy && (
         <div className="modal-overlay" onClick={() => setSelectedVacancy(null)}>
           <div className="modal-content" onClick={e => e.stopPropagation()}>
-            <button className="modal-close" onClick={() => setSelectedVacancy(null)}>×</button>
+            <button className="modal-close" onClick={() => setSelectedVacancy(null)}><X size={24} /></button>
             
             <div className="modal-header">
               <div className="modal-company">{selectedVacancy.companyName}</div>
               <h2 className="modal-title">{selectedVacancy.title}</h2>
               <div className="modal-meta">
-                <div className="meta-item"><span>💰</span> {selectedVacancy.salaryRange || 'Competitive Salary'}</div>
-                <div className="meta-item"><span>📍</span> Remote / On-site</div>
+                <div className="meta-item"><DollarSign size={16} color="var(--c-gold)" /> {selectedVacancy.salaryRange || 'Competitive Salary'}</div>
+                <div className="meta-item"><MapPin size={16} color="var(--c-gold)" /> Remote / On-site</div>
               </div>
             </div>
 
             <div className="modal-section">
               <h4 className="modal-section-title">Job Description</h4>
-              <div className="modal-body">{selectedVacancy.description}</div>
+              <div className="modal-body markdown-content">
+                <ReactMarkdown>{selectedVacancy.description}</ReactMarkdown>
+              </div>
             </div>
 
             <div className="modal-section">
               <h4 className="modal-section-title">Requirements</h4>
-              <div className="modal-body">{selectedVacancy.requirements}</div>
+              <div className="modal-body markdown-content">
+                <ReactMarkdown>{selectedVacancy.requirements}</ReactMarkdown>
+              </div>
             </div>
 
             <div className="card-footer" style={{marginTop: '40px'}}>

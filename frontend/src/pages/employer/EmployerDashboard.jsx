@@ -1,5 +1,21 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import { 
+  LayoutDashboard, 
+  Briefcase, 
+  PlusSquare, 
+  Users, 
+  ClipboardList, 
+  Settings, 
+  LogOut,
+  UserCheck,
+  Building,
+  TrendingUp,
+  FileText,
+  CheckCircle,
+  Clock,
+  X
+} from "lucide-react";
 import "./EmployerDashboard.css";
 import api from "../../services/api";
 
@@ -130,7 +146,7 @@ function Modal({ open, onClose, title, children, width = 560 }) {
       >
         <div className="ed-modal-header">
           <h3 className="ed-modal-title">{title}</h3>
-          <button className="ed-modal-close" onClick={onClose}>✕</button>
+          <button className="ed-modal-close" onClick={onClose}><X size={20} /></button>
         </div>
         <div className="ed-modal-body">{children}</div>
       </div>
@@ -208,7 +224,7 @@ function Overview({ employer, vacancies, orders, applications, onNavigate }) {
             className="ed-btn ed-btn--gold"
             onClick={() => onNavigate("post-vacancy")}
           >
-            <span>+</span> Post Vacancy
+            <PlusSquare size={18} /> Post Vacancy
           </button>
         </div>
       </div>
@@ -216,7 +232,7 @@ function Overview({ employer, vacancies, orders, applications, onNavigate }) {
       {/* Stat cards */}
       <div className="ed-stats-grid" ref={statsRef}>
         <StatCard
-          icon="◈"
+          icon={<Briefcase size={22} />}
           label="Open Vacancies"
           value={openVacancies}
           sub="Active job postings"
@@ -225,16 +241,16 @@ function Overview({ employer, vacancies, orders, applications, onNavigate }) {
           trigger={triggered}
         />
         <StatCard
-          icon="◉"
+          icon={<Users size={22} />}
           label="Total Applications"
           value={totalApps}
           sub="Across all vacancies"
-          color="var(--c-teal)"
+          color="#2dd4bf"
           delay="80ms"
           trigger={triggered}
         />
         <StatCard
-          icon="✦"
+          icon={<UserCheck size={22} />}
           label="Shortlisted"
           value={shortlisted}
           sub="Ready for interview"
@@ -243,7 +259,7 @@ function Overview({ employer, vacancies, orders, applications, onNavigate }) {
           trigger={triggered}
         />
         <StatCard
-          icon="⬡"
+          icon={<ClipboardList size={22} />}
           label="Pending Orders"
           value={pendingOrders}
           sub="Awaiting fulfilment"
@@ -1318,12 +1334,12 @@ export default function EmployerDashboard() {
   }
 
   const navItems = [
-    { id: "overview",     icon: "◈", label: "Overview" },
-    { id: "vacancies",    icon: "◉", label: "Vacancies",    badge: vacancies.filter(v => v.status === "OPEN").length },
-    { id: "post-vacancy", icon: "✦", label: "Post Vacancy" },
-    { id: "applications", icon: "⬡", label: "Applications", badge: applications.filter(a => a.status === "APPLIED").length },
-    { id: "orders",       icon: "◎", label: "Orders",       badge: orders.filter(o => o.status === "PENDING").length },
-    { id: "profile",      icon: "✧", label: "Profile" },
+    { id: "overview",     icon: <LayoutDashboard size={20} />, label: "Overview" },
+    { id: "vacancies",    icon: <Briefcase size={20} />, label: "Vacancies",    badge: vacancies.filter(v => v.status === "OPEN").length },
+    { id: "post-vacancy", icon: <PlusSquare size={20} />, label: "Post Vacancy" },
+    { id: "applications", icon: <Users size={20} />, label: "Applications", badge: applications.filter(a => a.status === "APPLIED").length },
+    { id: "orders",       icon: <ClipboardList size={20} />, label: "Orders",       badge: orders.filter(o => o.status === "PENDING").length },
+    { id: "profile",      icon: <Settings size={20} />, label: "Profile" },
   ];
 
   return (
@@ -1407,9 +1423,7 @@ export default function EmployerDashboard() {
 
         {/* Logout */}
         <button className="ed-logout-btn" onClick={handleLogout}>
-          <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
-            <path d="M6 13H3a1 1 0 01-1-1V3a1 1 0 011-1h3M10 10l3-3-3-3M13 7H6" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/>
-          </svg>
+          <LogOut size={16} />
           Sign Out
         </button>
       </aside>

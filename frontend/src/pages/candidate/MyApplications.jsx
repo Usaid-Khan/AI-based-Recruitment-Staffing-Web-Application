@@ -2,6 +2,15 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import authService from '../../services/authService';
 import candidateService from '../../services/candidateService';
+import { 
+  LayoutDashboard, 
+  User, 
+  FileText, 
+  Search, 
+  Briefcase, 
+  LogOut,
+  ExternalLink
+} from 'lucide-react';
 import './MyApplications.css';
 
 const STATUS_FILTERS = ['ALL', 'APPLIED', 'SHORTLISTED', 'INTERVIEWING', 'OFFERED', 'REJECTED'];
@@ -69,30 +78,30 @@ const MyApplications = () => {
         
         <nav className="sidebar-nav" style={{flex: 1, padding: '0 16px'}}>
           <Link to="/candidate/dashboard" className="nav-item" style={{display: 'flex', alignItems: 'center', gap: '12px', padding: '12px 16px', borderRadius: '8px', color: 'var(--c-text-muted)', textDecoration: 'none', transition: 'var(--transition)', marginBottom: '4px'}}>
-            <span className="nav-icon">📊</span>
+            <LayoutDashboard size={20} />
             Dashboard
           </Link>
           <Link to="/candidate/profile" className="nav-item" style={{display: 'flex', alignItems: 'center', gap: '12px', padding: '12px 16px', borderRadius: '8px', color: 'var(--c-text-muted)', textDecoration: 'none', transition: 'var(--transition)', marginBottom: '4px'}}>
-            <span className="nav-icon">👤</span>
+            <User size={20} />
             My Profile
           </Link>
           <Link to="/candidate/applications" className="nav-item nav-item--active" style={{display: 'flex', alignItems: 'center', gap: '12px', padding: '12px 16px', borderRadius: '8px', color: 'var(--c-gold)', backgroundColor: 'var(--c-gold-dim)', textDecoration: 'none', fontWeight: '600', marginBottom: '4px'}}>
-            <span className="nav-icon">📁</span>
+            <FileText size={20} />
             Applications
           </Link>
           <Link to="/candidate/vacancies" className="nav-item" style={{display: 'flex', alignItems: 'center', gap: '12px', padding: '12px 16px', borderRadius: '8px', color: 'var(--c-text-muted)', textDecoration: 'none', transition: 'var(--transition)', marginBottom: '4px'}}>
-            <span className="nav-icon">🔍</span>
+            <Search size={20} />
             Browse Jobs
           </Link>
           <Link to="/candidate/contracts" className="nav-item" style={{display: 'flex', alignItems: 'center', gap: '12px', padding: '12px 16px', borderRadius: '8px', color: 'var(--c-text-muted)', textDecoration: 'none', transition: 'var(--transition)', marginBottom: '4px'}}>
-            <span className="nav-icon">📄</span>
+            <Briefcase size={20} />
             My Contracts
           </Link>
         </nav>
 
         <div className="sidebar-footer" style={{padding: '24px', borderTop: '1px solid var(--c-border)'}}>
           <button className="btn-logout" onClick={handleLogout} style={{width: '100%', display: 'flex', alignItems: 'center', gap: '12px', padding: '12px 16px', borderRadius: '8px', color: '#f87171', background: 'rgba(239, 68, 68, 0.05)', border: '1px solid rgba(239, 68, 68, 0.1)', cursor: 'pointer', transition: 'var(--transition)', fontWeight: '600'}}>
-            <span className="nav-icon">⏻</span>
+            <LogOut size={18} />
             Logout
           </button>
         </div>
@@ -149,8 +158,8 @@ const MyApplications = () => {
                       </span>
                     </td>
                     <td>
-                      <button className="action-btn" onClick={() => navigate(`/vacancies/${app.vacancyId}`)}>
-                        View Job
+                      <button className="action-btn" onClick={() => navigate(`/candidate/vacancies`)} style={{display: 'flex', alignItems: 'center', gap: '6px'}}>
+                        View Job <ExternalLink size={14} />
                       </button>
                     </td>
                   </tr>
