@@ -6,7 +6,7 @@ import "./AiToolsPage.css";
 /* ─────────────────────────────────────────
    API Helpers
 ───────────────────────────────────────── */
-const BASE = "http://localhost:8080/api";
+const BASE = import.meta.env.VITE_API_URL || "http://localhost:8080/api";
 const token = () => localStorage.getItem("token");
 const authHeaders = () => ({
   "Content-Type": "application/json",
