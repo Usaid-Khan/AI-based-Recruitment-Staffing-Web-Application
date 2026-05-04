@@ -236,7 +236,7 @@ function Overview({ employer, vacancies, orders, applications, onNavigate }) {
           label="Open Vacancies"
           value={openVacancies}
           sub="Active job postings"
-          color="var(--c-gold)"
+          color="var(--c-text)"
           delay="0ms"
           trigger={triggered}
         />
@@ -245,7 +245,7 @@ function Overview({ employer, vacancies, orders, applications, onNavigate }) {
           label="Total Applications"
           value={totalApps}
           sub="Across all vacancies"
-          color="#2dd4bf"
+          color="var(--c-text)"
           delay="80ms"
           trigger={triggered}
         />
@@ -254,7 +254,7 @@ function Overview({ employer, vacancies, orders, applications, onNavigate }) {
           label="Shortlisted"
           value={shortlisted}
           sub="Ready for interview"
-          color="#f59e0b"
+          color="var(--c-text-dim)"
           delay="160ms"
           trigger={triggered}
         />
@@ -263,7 +263,7 @@ function Overview({ employer, vacancies, orders, applications, onNavigate }) {
           label="Pending Orders"
           value={pendingOrders}
           sub="Awaiting fulfilment"
-          color="#60a5fa"
+          color="var(--c-text-muted)"
           delay="240ms"
           trigger={triggered}
         />
@@ -1344,12 +1344,7 @@ export default function EmployerDashboard() {
 
   return (
     <div className="ed-root">
-      {/* Ambient background */}
-      <div className="ed-ambient">
-        <div className="ed-ambient-orb ed-ambient-orb--1" />
-        <div className="ed-ambient-orb ed-ambient-orb--2" />
-        <div className="ed-grid-overlay" />
-      </div>
+      {/* Clean monochrome background */}
 
       {/* ── Mobile top bar ── */}
       <div className="ed-topbar">

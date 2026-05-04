@@ -20,6 +20,54 @@ function useCountUp(target, duration = 2000, start = false) {
   return val;
 }
 
+/* ─── Typewriter hook ─── */
+const TYPEWRITER_PHRASES = [
+  "8 AI modules automating your recruitment.",
+  "Gemini AI matching & scores in seconds.",
+  "Auto-generate bios, posts & contracts.",
+  "One platform for your full placement flow.",
+];
+
+function useTypewriter(phrases, typingSpeed = 40, eraseSpeed = 20, pauseMs = 2200) {
+  const [displayed, setDisplayed] = useState("");
+  const [phraseIdx, setPhraseIdx] = useState(0);
+  const [charIdx, setCharIdx] = useState(0);
+  const [erasing, setErasing] = useState(false);
+  const [paused, setPaused] = useState(false);
+
+  useEffect(() => {
+    if (paused) {
+      const t = setTimeout(() => { setPaused(false); setErasing(true); }, pauseMs);
+      return () => clearTimeout(t);
+    }
+    const phrase = phrases[phraseIdx];
+    if (!erasing) {
+      if (charIdx < phrase.length) {
+        const t = setTimeout(() => {
+          setDisplayed(phrase.slice(0, charIdx + 1));
+          setCharIdx(c => c + 1);
+        }, typingSpeed);
+        return () => clearTimeout(t);
+      } else {
+        setPaused(true);
+      }
+    } else {
+      if (charIdx > 0) {
+        const t = setTimeout(() => {
+          setDisplayed(phrase.slice(0, charIdx - 1));
+          setCharIdx(c => c - 1);
+        }, eraseSpeed);
+        return () => clearTimeout(t);
+      } else {
+        setErasing(false);
+        setPhraseIdx(i => (i + 1) % phrases.length);
+      }
+    }
+  }, [charIdx, erasing, paused, phraseIdx, phrases, typingSpeed, eraseSpeed, pauseMs]);
+
+  return displayed;
+}
+
 /* ─── Stat item ─── */
 function StatItem({ value, suffix, label, start }) {
   const count = useCountUp(value, 2200, start);
@@ -37,15 +85,122 @@ function StatItem({ value, suffix, label, start }) {
 export default function Home() {
   const navigate = useNavigate();
   const statsRef = useRef(null);
+  const mockupRef = useRef(null);
   const [statsVisible, setStatsVisible] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [activeSection, setActiveSection] = useState("");
+  const [pillStyle, setPillStyle] = useState({ left: 0, width: 0, opacity: 0 });
+
+  const navRef = useRef(null);
+  const useTypewriterDisplay = useTypewriter(TYPEWRITER_PHRASES);
+
+
+  /* ── 3D tilt handlers ── */
+  const handleTiltMove = (e) => {
+    const el = mockupRef.current;
+    if (!el) return;
+    const rect = el.getBoundingClientRect();
+    const x = e.clientX - rect.left;   // px from left edge
+    const y = e.clientY - rect.top;    // px from top edge
+    const cx = rect.width / 2;
+    const cy = rect.height / 2;
+    // Normalise to -1 … +1
+    const nx = (x - cx) / cx;
+    const ny = (y - cy) / cy;
+    // rotateX: mouse near top → tilt top toward viewer (+X)
+    // rotateY: mouse near right → tilt right toward viewer (+Y)
+    const rotX = ny * -12;
+    const rotY = nx * 12;
+    el.style.transition = 'transform 0.08s linear';
+    el.style.transform = `perspective(1200px) rotateX(${rotX}deg) rotateY(${rotY}deg)`;
+  };
+
+  const handleTiltLeave = () => {
+    const el = mockupRef.current;
+    if (!el) return;
+    el.style.transition = 'transform 0.6s cubic-bezier(0.23, 1, 0.32, 1)';
+    el.style.transform = 'perspective(1200px) rotateY(-8deg) rotateX(4deg)';
+  };
+
+  const handleSpotlight = (e) => {
+    const el = e.currentTarget;
+    const rect = el.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    el.style.setProperty("--mouse-x", `${x}px`);
+    el.style.setProperty("--mouse-y", `${y}px`);
+  };
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 40);
-    window.addEventListener("scroll", onScroll);
-    return () => window.removeEventListener("scroll", onScroll);
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 50);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  // Intersection Observer for Scroll Spy
+  useEffect(() => {
+    const sections = ["features", "how-it-works", "testimonials"];
+    const observerOptions = {
+      root: null,
+      rootMargin: "-40% 0px -40% 0px", // Detect when section is in middle of screen
+      threshold: 0
+    };
+
+    const observerCallback = (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          // Only set active if we've scrolled a bit past the hero
+          if (window.scrollY > 200) {
+            setActiveSection(entry.target.id);
+          } else {
+            setActiveSection("");
+          }
+        }
+      });
+    };
+
+
+    const observer = new IntersectionObserver(observerCallback, observerOptions);
+    sections.forEach((id) => {
+      const el = document.getElementById(id);
+      if (el) observer.observe(el);
+    });
+
+    return () => observer.disconnect();
+  }, []);
+
+  // Update nav pill position
+  useEffect(() => {
+    // If at the very top, always hide the pill
+    const handleTopScroll = () => {
+      if (window.scrollY < 150) {
+        setActiveSection("");
+      }
+    };
+    window.addEventListener("scroll", handleTopScroll);
+
+    if (!activeSection || !navRef.current) {
+      setPillStyle(prev => ({ ...prev, opacity: 0 }));
+      return () => window.removeEventListener("scroll", handleTopScroll);
+    }
+
+    const activeLink = navRef.current.querySelector(`a[href="#${activeSection}"]`);
+    if (activeLink) {
+      setPillStyle({
+        left: activeLink.offsetLeft,
+        width: activeLink.offsetWidth,
+        opacity: 1
+      });
+    } else {
+      setPillStyle(prev => ({ ...prev, opacity: 0 }));
+    }
+
+    return () => window.removeEventListener("scroll", handleTopScroll);
+  }, [activeSection]);
+
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -106,7 +261,10 @@ export default function Home() {
     { name: "Sarah Mitchell", role: "Head of Talent, NovaCorp", quote: "IntelliRecruit cut our time-to-hire by 60%. The AI recommendations are eerily accurate.", avatar: "SM" },
     { name: "David Osei", role: "Recruitment Director, Apexia", quote: "The contract generator alone saved us thousands in legal fees. Absolute game-changer.", avatar: "DO" },
     { name: "Priya Sharma", role: "HR Manager, Stratum Group", quote: "Our candidates love how professional their AI-generated bios look. Placements are up 40%.", avatar: "PS" },
+    { name: "Marcus Thorne", role: "Founder, Thorne Tech", quote: "The AI vacancy generator is the best I've used. It understands exactly what we need.", avatar: "MT" },
+    { name: "Elena Rossi", role: "Operations Lead, Global Recruit", quote: "From order to signed contract, everything is streamlined. Simply amazing.", avatar: "ER" },
   ];
+
 
   return (
     <div className="home-root">
@@ -119,10 +277,20 @@ export default function Home() {
             <span className="brand-text">IntelliRecruit</span>
           </a>
 
-          <ul className={`nav-links ${menuOpen ? "nav-links--open" : ""}`}>
-            <li><a href="#features" onClick={() => setMenuOpen(false)}>Features</a></li>
-            <li><a href="#how-it-works" onClick={() => setMenuOpen(false)}>How It Works</a></li>
-            <li><a href="#testimonials" onClick={() => setMenuOpen(false)}>Testimonials</a></li>
+          <ul className={`nav-links ${menuOpen ? "nav-links--open" : ""}`} ref={navRef}>
+            {activeSection && (
+              <div 
+                className="nav-pill" 
+                style={{
+                  transform: `translateX(${pillStyle.left}px)`,
+                  width: `${pillStyle.width}px`,
+                  opacity: pillStyle.opacity
+                }}
+              />
+            )}
+            <li><a href="#features" className={activeSection === "features" ? "active" : ""} onClick={() => setMenuOpen(false)}>Features</a></li>
+            <li><a href="#how-it-works" className={activeSection === "how-it-works" ? "active" : ""} onClick={() => setMenuOpen(false)}>How It Works</a></li>
+            <li><a href="#testimonials" className={activeSection === "testimonials" ? "active" : ""} onClick={() => setMenuOpen(false)}>Testimonials</a></li>
           </ul>
 
           <div className="nav-actions">
@@ -146,12 +314,7 @@ export default function Home() {
 
       {/* ── Hero ── */}
       <section className="hero">
-        <div className="hero-bg">
-          <div className="grid-overlay" />
-          <div className="orb orb-1" />
-          <div className="orb orb-2" />
-          <div className="orb orb-3" />
-        </div>
+
 
         <div className="hero-content">
           <div className="hero-badge">
@@ -175,7 +338,7 @@ export default function Home() {
             <button className="btn-hero-primary" onClick={() => navigate("/register")}>
               Start Free Today
               <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             </button>
             <button className="btn-hero-secondary" onClick={() => navigate("/login")}>
@@ -193,13 +356,18 @@ export default function Home() {
         </div>
 
         <div className="hero-visual">
-          <div className="dashboard-mockup">
+          <div
+            className="dashboard-mockup"
+            ref={mockupRef}
+            onMouseMove={handleTiltMove}
+            onMouseLeave={handleTiltLeave}
+          >
             <div className="mockup-bar">
               <span /><span /><span />
             </div>
             <div className="mockup-body">
               <div className="mockup-sidebar">
-                {["Dashboard","Candidates","Vacancies","Orders","Placements","AI Tools"].map(item => (
+                {["Dashboard", "Candidates", "Vacancies", "Orders", "Placements", "AI Tools"].map(item => (
                   <div key={item} className="mockup-nav-item">{item}</div>
                 ))}
               </div>
@@ -208,7 +376,7 @@ export default function Home() {
                   <div className="mockup-card-label">AI Match Score</div>
                   <div className="mockup-card-value">94%</div>
                   <div className="mockup-bar-row">
-                    <div className="mockup-bar-fill" style={{width:"94%"}} />
+                    <div className="mockup-bar-fill" style={{ width: "94%" }} />
                   </div>
                 </div>
                 <div className="mockup-candidates">
@@ -254,15 +422,21 @@ export default function Home() {
         <div className="section-header">
           <div className="section-eyebrow">Platform Features</div>
           <h2 className="section-title">Everything your agency needs,<br />powered by AI</h2>
-          <p className="section-sub">
-            Eight AI-powered modules working together to automate the
-            most time-consuming parts of recruitment.
+          <p className="section-sub typewriter-sub">
+            <span>{useTypewriterDisplay}</span>
+            <span className="typewriter-cursor">|</span>
           </p>
         </div>
 
         <div className="features-grid">
           {features.map((f, i) => (
-            <div className="feature-card" key={i} style={{"--delay": `${i * 80}ms`}}>
+            <div
+              className="feature-card"
+              key={i}
+              style={{ "--delay": `${i * 80}ms` }}
+              onMouseMove={handleSpotlight}
+            >
+              <div className="feature-spotlight" />
               <div className="feature-top">
                 <span className="feature-icon">{f.icon}</span>
                 <span className="feature-tag">{f.tag}</span>
@@ -307,9 +481,17 @@ export default function Home() {
           <h2 className="section-title">Built for every stakeholder</h2>
         </div>
 
-        <div className="roles-grid">
+        <div
+          className="roles-grid"
+          onMouseMove={handleSpotlight}
+        >
           <div className="role-card role-card--candidate">
-            <div className="role-card-icon">👤</div>
+            <div className="feature-spotlight" />
+            <div className="role-card-icon">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" />
+              </svg>
+            </div>
             <h3>Candidate</h3>
             <ul>
               <li>AI-generated professional bio</li>
@@ -317,14 +499,18 @@ export default function Home() {
               <li>Track application status</li>
               <li>Download placement contracts</li>
             </ul>
-            <button className="btn-role" onClick={() => navigate("/register")}>
+            <button className="btn-role btn-role--featured" onClick={() => navigate("/register")}>
               Join as Candidate
             </button>
           </div>
 
-          <div className="role-card role-card--employer role-card--featured">
-            <div className="role-card-badge">Most Popular</div>
-            <div className="role-card-icon">🏢</div>
+          <div className="role-card role-card--employer">
+            <div className="feature-spotlight" />
+            <div className="role-card-icon">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="2" y="7" width="20" height="14" rx="2" ry="2" /><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
+              </svg>
+            </div>
             <h3>Employer</h3>
             <ul>
               <li>AI vacancy generator & filter</li>
@@ -338,7 +524,12 @@ export default function Home() {
           </div>
 
           <div className="role-card role-card--admin">
-            <div className="role-card-icon">⚙️</div>
+            <div className="feature-spotlight" />
+            <div className="role-card-icon">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+              </svg>
+            </div>
             <h3>Administrator</h3>
             <ul>
               <li>Full platform oversight</li>
@@ -346,7 +537,7 @@ export default function Home() {
               <li>Blog & email AI tools</li>
               <li>Manage all users & placements</li>
             </ul>
-            <button className="btn-role" onClick={() => navigate("/register")}>
+            <button className="btn-role btn-role--featured" onClick={() => navigate("/register")}>
               Admin Access
             </button>
           </div>
@@ -360,20 +551,22 @@ export default function Home() {
           <h2 className="section-title section-title--light">Trusted by recruitment leaders</h2>
         </div>
 
-        <div className="testimonials-grid">
-          {testimonials.map((t, i) => (
-            <div className="testimonial-card" key={i}>
-              <div className="testimonial-quote">"</div>
-              <p className="testimonial-text">{t.quote}</p>
-              <div className="testimonial-author">
-                <div className="testimonial-avatar">{t.avatar}</div>
-                <div>
-                  <div className="testimonial-name">{t.name}</div>
-                  <div className="testimonial-role">{t.role}</div>
+        <div className="testimonials-track">
+          <div className="testimonials-tape">
+            {[...testimonials, ...testimonials].map((t, i) => (
+              <div className="testimonial-card" key={i}>
+                <div className="testimonial-quote">"</div>
+                <p className="testimonial-text">{t.quote}</p>
+                <div className="testimonial-author">
+                  <div className="testimonial-avatar">{t.avatar}</div>
+                  <div className="testimonial-meta">
+                    <div className="testimonial-name">{t.name}</div>
+                    <div className="testimonial-role">{t.role}</div>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </section>
 
