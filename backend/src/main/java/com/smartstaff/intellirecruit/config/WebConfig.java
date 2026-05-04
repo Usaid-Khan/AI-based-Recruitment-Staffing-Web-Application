@@ -7,10 +7,17 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
 
+    @org.springframework.beans.factory.annotation.Value("${app.cors.allowed-origins}")
+    private String allowedOrigins;
+
     @Override
     public void addCorsMappings(CorsRegistry registry) {
+        String[] origins = java.util.Arrays.stream(allowedOrigins.split(","))
+                .map(String::trim)
+                .toArray(String[]::new);
+
         registry.addMapping("/api/**")
-                .allowedOrigins("http://localhost:5173") // Vite default port
+                .allowedOrigins(origins)
                 .allowedMethods("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
                 .allowedHeaders("*")
                 .allowCredentials(true);

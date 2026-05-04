@@ -32,7 +32,7 @@ export default function Login() {
       else navigate("/candidate/dashboard");
     } catch (err) {
       if (err.message === "Network Error") {
-        setError("Unable to connect to the server. Please ensure the backend is running on port 8080.");
+        setError("Unable to connect to the server. Please check your internet connection or try again later.");
       } else {
         const backendMessage = typeof err.response?.data === 'string' 
           ? err.response.data 
