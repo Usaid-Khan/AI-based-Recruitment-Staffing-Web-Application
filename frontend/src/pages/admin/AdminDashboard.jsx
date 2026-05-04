@@ -1334,6 +1334,10 @@ export default function AdminDashboard() {
   };
 
   const handleNavigate = (section) => {
+    if (section === "ai-tools") {
+      navigate("/ai/tools");
+      return;
+    }
     setActiveSection(section);
     setSidebarOpen(false);
     window.scrollTo({ top: 0, behavior: "smooth" });

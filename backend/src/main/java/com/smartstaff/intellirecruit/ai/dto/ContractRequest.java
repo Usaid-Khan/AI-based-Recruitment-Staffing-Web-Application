@@ -6,8 +6,8 @@ import java.time.LocalDate;
 
 @Data
 public class ContractRequest {
-    private Long candidateId;
-    private Long employerId;
+    private String candidateEmail;
+    private String employerEmail;
     private Long vacancyId;     // optional
     private LocalDate startDate;
     private String salaryAmount;

@@ -26,13 +26,15 @@ public class EmailGeneratorService {
         String triggeredBy = SecurityContextHolder.getContext()
                 .getAuthentication().getName();
 
-        // No entity ID or recipient for generic email templates
+        // Notify recipient via email
         aiEventProducer.publishAiGeneratedEvent(
-                AiEventBuilder.buildSilent(
+                AiEventBuilder.build(
                         "EMAIL",
-                        null,
+                        null, // no specific entity ID needed for generic emails
                         generatedEmail,
-                        triggeredBy
+                        triggeredBy,
+                        request.getRecipientEmail(),
+                        request.getRecipientName()
                 )
         );
 

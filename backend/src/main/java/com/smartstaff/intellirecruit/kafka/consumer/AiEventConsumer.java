@@ -39,12 +39,24 @@ public class AiEventConsumer {
 
             // 2. Send email notification if requested
             if (event.isSendEmailNotification() && event.getRecipientEmail() != null) {
-                emailService.sendAiGenerationNotification(
-                        event.getRecipientEmail(),
-                        event.getRecipientName(),
-                        event.getFeatureType()
-                );
-                log.info("Email notification sent to: {}", event.getRecipientEmail());
+                log.info("Checking email notification for type: {}", contentType);
+                
+                if (contentType == AiGeneratedContent.ContentType.EMAIL) {
+                    // For EMAIL type: send the actual AI-generated content, not a generic notification
+                    log.info("Sending raw AI-generated email to: {}", event.getRecipientEmail());
+                    emailService.sendRawAiEmail(
+                            event.getRecipientEmail(),
+                            event.getGeneratedContent()
+                    );
+                } else {
+                    // For all other types (BIO, CONTRACT, VACANCY, etc.): keep generic notification
+                    log.info("Sending generic AI content notification for {} to: {}", contentType, event.getRecipientEmail());
+                    emailService.sendAiGenerationNotification(
+                            event.getRecipientEmail(),
+                            event.getRecipientName(),
+                            event.getFeatureType()
+                    );
+                }
             }
         } catch (Exception e) {
             log.error("Error processing AI event — eventId: {}, error: {}",

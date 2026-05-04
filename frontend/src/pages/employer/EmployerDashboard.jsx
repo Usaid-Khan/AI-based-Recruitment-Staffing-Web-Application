@@ -14,7 +14,8 @@ import {
   FileText,
   CheckCircle,
   Clock,
-  X
+  X,
+  Sparkles
 } from "lucide-react";
 import "./EmployerDashboard.css";
 import api from "../../services/api";
@@ -1292,6 +1293,10 @@ export default function EmployerDashboard() {
   };
 
   const handleNavigate = (section, data = null) => {
+    if (section === "ai-tools") {
+      navigate("/ai/tools");
+      return;
+    }
     setActiveSection(section);
     setActiveSectionData(data);
     setSidebarOpen(false);
@@ -1340,6 +1345,7 @@ export default function EmployerDashboard() {
     { id: "applications", icon: <Users size={20} />, label: "Applications", badge: applications.filter(a => a.status === "APPLIED").length },
     { id: "orders",       icon: <ClipboardList size={20} />, label: "Orders",       badge: orders.filter(o => o.status === "PENDING").length },
     { id: "profile",      icon: <Settings size={20} />, label: "Profile" },
+    { id: "ai-tools",     icon: <Sparkles size={20} />, label: "AI Tools" },
   ];
 
   return (

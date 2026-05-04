@@ -2,15 +2,13 @@ package com.smartstaff.intellirecruit.ai.service;
 
 import com.smartstaff.intellirecruit.ai.dto.AiResponse;
 import com.smartstaff.intellirecruit.ai.dto.ContractRequest;
-import com.smartstaff.intellirecruit.entity.AiGeneratedContent;
-import com.smartstaff.intellirecruit.entity.Candidate;
-import com.smartstaff.intellirecruit.entity.Employer;
-import com.smartstaff.intellirecruit.entity.Vacancy;
+import com.smartstaff.intellirecruit.entity.*;
 import com.smartstaff.intellirecruit.exception.ResourceNotFoundException;
 import com.smartstaff.intellirecruit.kafka.event.AiEventBuilder;
 import com.smartstaff.intellirecruit.kafka.producer.AiEventProducer;
 import com.smartstaff.intellirecruit.repository.CandidateRepository;
 import com.smartstaff.intellirecruit.repository.EmployerRepository;
+import com.smartstaff.intellirecruit.repository.UserRepository;
 import com.smartstaff.intellirecruit.repository.VacancyRepository;
 import com.smartstaff.intellirecruit.service.AiContentService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,13 +31,23 @@ public class ContractGeneratorService {
     private AiContentService aiContentService;
     @Autowired
     private AiEventProducer aiEventProducer;
+    @Autowired
+    private UserRepository userRepository;
 
     public AiResponse generateContract(ContractRequest request) {
-        Candidate candidate = candidateRepository.findById(request.getCandidateId())
-                .orElseThrow(() -> new ResourceNotFoundException("Candidate", request.getCandidateId()));
+        // Finding candidate by its email
+        User candidateUser = userRepository.findByEmail(request.getCandidateEmail())
+                .orElseThrow(() -> new ResourceNotFoundException("Candidate User", 0L));
 
-        Employer employer = employerRepository.findById(request.getEmployerId())
-                .orElseThrow(() -> new ResourceNotFoundException("Employer", request.getEmployerId()));
+        Candidate candidate = candidateRepository.findByUserId(candidateUser.getId())
+                .orElseThrow(() -> new ResourceNotFoundException("Candidate User", candidateUser.getId()));
+
+        // Finding employer by its email
+        User employerUserRecord = userRepository.findByEmail(request.getEmployerEmail())
+                .orElseThrow(() -> new ResourceNotFoundException("Employer User", 0L));
+
+        Employer employer = employerRepository.findByUserId(employerUserRecord.getId())
+                .orElseThrow(() -> new ResourceNotFoundException("Employer profile for user", employerUserRecord.getId()));
 
         Vacancy vacancy = null;
         if (request.getVacancyId() != null) {
@@ -57,7 +65,7 @@ public class ContractGeneratorService {
         aiEventProducer.publishAiGeneratedEvent(
                 AiEventBuilder.build(
                         "CONTRACT",
-                        request.getCandidateId(),
+                        candidate.getId(),
                         generatedContract,
                         triggeredBy,
                         candidate.getUser().getEmail(),
@@ -74,7 +82,7 @@ public class ContractGeneratorService {
         return AiResponse.builder()
                 .content(generatedContract)
                 .type("CONTRACT")
-                .entityId(request.getCandidateId())
+                .entityId(candidate.getId())
                 .saved(true)
                 .build();
     }

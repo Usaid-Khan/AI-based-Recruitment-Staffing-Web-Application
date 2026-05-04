@@ -5,6 +5,7 @@ import com.smartstaff.intellirecruit.ai.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -28,28 +29,30 @@ public class AiController {
     private BlogGeneratorService blogGeneratorService;
 
     // Feature 1: Generate candidate bio
-    @PostMapping("/candidates/{id}/generate-bio")
-    @PreAuthorize("hasAnyRole('ADMIN', 'CANDIDATE')")
-    public ResponseEntity<AiResponse> generateBio(@PathVariable Long id, @RequestBody(required = false) AiRequest request) {
+    @PostMapping("/candidates/me/generate-bio")
+    @PreAuthorize("hasRole('CANDIDATE')")
+    public ResponseEntity<AiResponse> generateBio(@RequestBody(required = false) AiRequest request) {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+
         String custom = request != null ? request.getCustomPrompt() : null;
-        return ResponseEntity.ok(bioGeneratorService.generateBio(id, custom));
+        return ResponseEntity.ok(bioGeneratorService.generateBio(email, custom));
     }
 
     // Feature 2: Filter/clean candidate bio
-    @PostMapping("/candidates/{id}/filter-bio")
+    @PostMapping("/candidates/filter-bio")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<AiResponse> filterBio(@PathVariable Long id, @RequestBody(required = false) AiRequest request) {
+    public ResponseEntity<AiResponse> filterBio(@RequestParam String email, @RequestBody(required = false) AiRequest request) {
         String policies = request != null ? request.getCustomPrompt() : null;
-        return ResponseEntity.ok(bioFilterService.filterBio(id, policies));
+        return ResponseEntity.ok(bioFilterService.filterBio(email, policies));
     }
 
     // Feature 3: Generate job vacancy
-    @PostMapping("/employers/{id}/generate-vacancy")
+    @PostMapping("/employers/generate-vacancy")
     @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYER')")
-    public ResponseEntity<AiResponse> generateVacancy(@PathVariable Long id, @RequestParam(required = false) String jobTitle, @RequestParam(required = false) String salaryRange, @RequestParam(required = false) String experienceLevel, @RequestParam(required = false) String keySkills, @RequestBody(required = false) AiRequest request) {
+    public ResponseEntity<AiResponse> generateVacancy(@RequestParam String email, @RequestParam(required = false) String jobTitle, @RequestParam(required = false) String salaryRange, @RequestParam(required = false) String experienceLevel, @RequestParam(required = false) String keySkills, @RequestBody(required = false) AiRequest request) {
         String custom = request != null ? request.getCustomPrompt() : null;
         return ResponseEntity.ok(vacancyGeneratorService.generateVacancy(
-                id, jobTitle, salaryRange, experienceLevel, keySkills, custom));
+                email, jobTitle, salaryRange, experienceLevel, keySkills, custom));
     }
 
     // Feature 4: Filter/rewrite job vacancy

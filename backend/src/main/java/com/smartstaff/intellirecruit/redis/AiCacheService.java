@@ -19,7 +19,6 @@ public class AiCacheService {
 
     // Key pattern: "ai:{featureType}:{entityId}"
     // e.g. "ai:BIO:42", "ai:RECOMMENDATION:vacancyId:7"
-
     public void cacheResponse(String featureType, Long entityId, String content) {
         try {
             String key = buildKey(featureType, entityId);
