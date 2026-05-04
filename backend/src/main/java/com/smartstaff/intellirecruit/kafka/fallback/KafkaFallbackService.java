@@ -37,13 +37,22 @@ public class KafkaFallbackService {
 
             // 2. Send email synchronously
             if (event.isSendEmailNotification() && event.getRecipientEmail() != null) {
-                emailService.sendAiGenerationNotification(
-                        event.getRecipientEmail(),
-                        event.getRecipientName(),
-                        event.getFeatureType()
-                );
-                log.info("Fallback: Email sent directly to {}",
-                        event.getRecipientEmail());
+                if ("EMAIL".equalsIgnoreCase(event.getFeatureType())) {
+                    // For EMAIL type: send the actual AI-generated content, not a generic notification
+                    emailService.sendRawAiEmail(
+                            event.getRecipientEmail(),
+                            event.getGeneratedContent()
+                    );
+                    log.info("Fallback: AI-generated email sent directly to {}", event.getRecipientEmail());
+                } else {
+                    // For all other types (BIO, CONTRACT, VACANCY, etc.): keep generic notification
+                    emailService.sendAiGenerationNotification(
+                            event.getRecipientEmail(),
+                            event.getRecipientName(),
+                            event.getFeatureType()
+                    );
+                    log.info("Fallback: Email notification sent to {}", event.getRecipientEmail());
+                }
             }
         } catch (Exception e) {
             log.error("Fallback processing also failed for type: {}, error: {}",

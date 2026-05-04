@@ -1195,6 +1195,10 @@ export default function CandidateDashboard() {
   };
 
   const handleNavigate = (section) => {
+    if (section === "ai-tools") {
+      navigate("/ai/tools");
+      return;
+    }
     setActiveSection(section);
     setSidebarOpen(false);
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -1243,6 +1247,7 @@ export default function CandidateDashboard() {
     { id: "applications",  icon: <FileText size={20} />, label: "Applications", badge: newApps },
     { id: "placements",    icon: <Briefcase size={20} />, label: "Placements",   badge: placements.length },
     { id: "profile",       icon: <User size={20} />, label: "My Profile" },
+    { id: "ai-tools",      icon: <Sparkles size={20} />, label: "AI Tools" },
   ];
 
   return (

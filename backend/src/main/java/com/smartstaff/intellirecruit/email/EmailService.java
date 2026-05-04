@@ -2,6 +2,9 @@ package com.smartstaff.intellirecruit.email;
 
 import jakarta.mail.internet.MimeMessage;
 import lombok.extern.slf4j.Slf4j;
+import org.commonmark.node.Node;
+import org.commonmark.parser.Parser;
+import org.commonmark.renderer.html.HtmlRenderer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -12,6 +15,9 @@ import org.springframework.stereotype.Service;
 @Service
 @Slf4j
 public class EmailService {
+    private final Parser parser = Parser.builder().build();
+    private final HtmlRenderer renderer = HtmlRenderer.builder().build();
+
     @Autowired
     private JavaMailSender mailSender;
 
@@ -75,6 +81,31 @@ public class EmailService {
         String subject = "Your AI Content is Ready";
         String body = EmailTemplates.aiGenerationReady(name, featureType);
         sendHtmlEmail(toEmail, subject, body);
+    }
+
+    // Send AI-generated email content directly (extracting subject if present)
+    @Async
+    public void sendRawAiEmail(String toEmail, String content) {
+        String trimmed = content != null ? content.trim() : "";
+        String subject = "AI-Generated Recruitment Email";
+        String markdownBody = trimmed;
+
+        // Try to extract subject case-insensitively
+        if (trimmed.toLowerCase().startsWith("subject:")) {
+            int firstNewline = trimmed.indexOf("\n");
+            if (firstNewline > 8) {
+                subject = trimmed.substring(8, firstNewline).trim();
+                markdownBody = trimmed.substring(firstNewline).trim();
+            }
+        }
+
+        log.info("Preparing raw AI email — Subject: {}", subject);
+        
+        // Convert Markdown to HTML
+        Node document = parser.parse(markdownBody);
+        String htmlBody = renderer.render(document);
+        
+        sendHtmlEmail(toEmail, subject, htmlBody);
     }
 
     // New vacancy notification to available candidates

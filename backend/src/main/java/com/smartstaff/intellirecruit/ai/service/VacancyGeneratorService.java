@@ -3,11 +3,13 @@ package com.smartstaff.intellirecruit.ai.service;
 import com.smartstaff.intellirecruit.ai.dto.AiResponse;
 import com.smartstaff.intellirecruit.entity.AiGeneratedContent;
 import com.smartstaff.intellirecruit.entity.Employer;
+import com.smartstaff.intellirecruit.entity.User;
 import com.smartstaff.intellirecruit.exception.ResourceNotFoundException;
 import com.smartstaff.intellirecruit.kafka.event.AiEventBuilder;
 import com.smartstaff.intellirecruit.kafka.producer.AiEventProducer;
 import com.smartstaff.intellirecruit.redis.AiCacheService;
 import com.smartstaff.intellirecruit.repository.EmployerRepository;
+import com.smartstaff.intellirecruit.repository.UserRepository;
 import com.smartstaff.intellirecruit.service.AiContentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -25,28 +27,33 @@ public class VacancyGeneratorService {
     private AiCacheService aiCacheService;
     @Autowired
     private AiEventProducer aiEventProducer;
+    @Autowired
+    private UserRepository userRepository;
 
-    public AiResponse generateVacancy(Long employerId, String jobTitle, String salaryRange, String experienceLevel, String keySkills, String customInstructions) {
+    public AiResponse generateVacancy(String employerEmail, String jobTitle, String salaryRange, String experienceLevel, String keySkills, String customInstructions) {
+        User user = userRepository.findByEmail(employerEmail)
+                .orElseThrow(() -> new ResourceNotFoundException("Employer User"));
+
+        Employer employer = employerRepository.findByUserId(user.getId())
+                .orElseThrow(() -> new ResourceNotFoundException("Employer User", user.getId()));
+
         // 1. Check Redis cache first
-        String cached = aiCacheService.getCachedResponse("JOB_VACANCY", employerId);
+        String cached = aiCacheService.getCachedResponse("JOB_VACANCY", employer.getId());
         if (cached != null && customInstructions == null) {
             return AiResponse.builder()
                     .content(cached)
                     .type("JOB_VACANCY")
-                    .entityId(employerId)
+                    .entityId(employer.getId())
                     .saved(false) // came from cache, not freshly generated
                     .build();
         }
 
         // 2. Cache miss — call Gemini
-        Employer employer = employerRepository.findById(employerId)
-                .orElseThrow(() -> new ResourceNotFoundException("Employer", employerId));
-
         String prompt = buildPrompt(employer, jobTitle, salaryRange, experienceLevel, keySkills, customInstructions);
         String generatedVacancy = geminiAiService.generate(prompt);
 
         // 3. Store in Redis cache
-        aiCacheService.cacheResponse("JOB_VACANCY", employerId, generatedVacancy);
+        aiCacheService.cacheResponse("JOB_VACANCY", employer.getId(), generatedVacancy);
 
         String triggeredBy = SecurityContextHolder.getContext()
                 .getAuthentication().getName();
@@ -54,7 +61,7 @@ public class VacancyGeneratorService {
         aiEventProducer.publishAiGeneratedEvent(
                 AiEventBuilder.buildSilent(
                         "JOB_VACANCY",
-                        employerId,
+                        employer.getId(),
                         generatedVacancy,
                         triggeredBy
                 )
@@ -69,7 +76,7 @@ public class VacancyGeneratorService {
         return AiResponse.builder()
                 .content(generatedVacancy)
                 .type("JOB_VACANCY")
-                .entityId(employerId)
+                .entityId(employer.getId())
                 .saved(true)
                 .build();
     }
