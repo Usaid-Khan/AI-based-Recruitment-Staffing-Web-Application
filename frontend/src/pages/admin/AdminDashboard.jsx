@@ -85,7 +85,7 @@ function Empty({ icon, title, sub, action, onAction }) {
       <div className="ad-empty-icon">{icon}</div>
       <div className="ad-empty-title">{title}</div>
       <div className="ad-empty-sub">{sub}</div>
-      {action && <button className="ad-btn ad-btn--gold" onClick={onAction}>{action}</button>}
+      {action && <button className="ad-btn ad-btn--admin-accent" onClick={onAction}>{action}</button>}
     </div>
   );
 }
@@ -189,7 +189,11 @@ function Overview({ stats, onNavigate }) {
           </p>
         </div>
         <div className="ad-welcome-badge">
-          <span className="ad-admin-icon">⚙️</span>
+          <span className="ad-admin-icon">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 2L4.5 6.33V15L12 19.33L19.5 15V6.33L12 2Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </span>
           <span className="ad-admin-role">Admin</span>
         </div>
       </div>
@@ -461,7 +465,7 @@ function Placements({ notify }) {
           <div className="ad-section-eyebrow">Placement Management</div>
           <h2 className="ad-section-title">All Placements</h2>
         </div>
-        <button className="ad-btn ad-btn--gold" onClick={() => setShowCreate(true)}>
+        <button className="ad-btn ad-btn--admin-accent" onClick={() => setShowCreate(true)}>
           + New Placement
         </button>
       </div>
@@ -548,7 +552,7 @@ function Placements({ notify }) {
           </Field>
           <div className="ad-modal-actions" style={{marginTop:20}}>
             <button type="button" className="ad-btn ad-btn--ghost" onClick={() => setShowCreate(false)}>Cancel</button>
-            <button type="submit" className={`ad-btn ad-btn--gold ${saving?"ad-btn--loading":""}`} disabled={saving}>
+            <button type="submit" className={`ad-btn ad-btn--admin-accent ${saving?"ad-btn--loading":""}`} disabled={saving}>
               {saving ? <><span className="ad-spinner"/>Creating…</> : "Create Placement"}
             </button>
           </div>
@@ -930,7 +934,7 @@ function BlogManager({ notify }) {
           <div className="ad-section-eyebrow">Content Management</div>
           <h2 className="ad-section-title">Blog Manager</h2>
         </div>
-        <button className="ad-btn ad-btn--gold" onClick={openCreate}>+ New Post</button>
+        <button className="ad-btn ad-btn--admin-accent" onClick={openCreate}>+ New Post</button>
       </div>
 
       {loading ? (
@@ -1023,7 +1027,7 @@ function BlogManager({ notify }) {
                   onChange={e=>setAiForm({...aiForm,wordCount:Number(e.target.value)})} />
               </Field>
             </div>
-            <button className={`ad-btn ad-btn--gold ${aiLoading?"ad-btn--loading":""}`}
+            <button className={`ad-btn ad-btn--admin-accent ${aiLoading?"ad-btn--loading":""}`}
               onClick={handleAiGenerate} disabled={aiLoading}>
               {aiLoading ? <><span className="ad-spinner"/>Generating…</> : "Generate Post ✦"}
             </button>
@@ -1048,7 +1052,7 @@ function BlogManager({ notify }) {
           </label>
           <div className="ad-modal-actions" style={{marginTop:20}}>
             <button type="button" className="ad-btn ad-btn--ghost" onClick={() => setShowCreate(false)}>Cancel</button>
-            <button type="submit" className={`ad-btn ad-btn--gold ${saving?"ad-btn--loading":""}`} disabled={saving}>
+            <button type="submit" className={`ad-btn ad-btn--admin-accent ${saving?"ad-btn--loading":""}`} disabled={saving}>
               {saving ? <><span className="ad-spinner"/>{editPost?"Saving…":"Creating…"}</> : (editPost?"Save Changes":"Create Post")}
             </button>
           </div>
@@ -1263,7 +1267,7 @@ function AiTools({ notify }) {
           )}
 
           <button
-            className={`ad-btn ad-btn--gold ad-btn--lg ${loading?"ad-btn--loading":""}`}
+            className={`ad-btn ad-btn--admin-accent ad-btn--lg ${loading?"ad-btn--loading":""}`}
             onClick={runAi}
             disabled={loading}
             style={{marginTop:20}}
@@ -1367,7 +1371,7 @@ export default function AdminDashboard() {
         <div className="ad-error-icon">⚠</div>
         <div className="ad-error-title">Dashboard failed to load</div>
         <div className="ad-error-sub">{initError}</div>
-        <button className="ad-btn ad-btn--gold" onClick={loadStats}>Retry</button>
+        <button className="ad-btn ad-btn--admin-accent" onClick={loadStats}>Retry</button>
       </div>
     );
   }
@@ -1429,17 +1433,7 @@ export default function AdminDashboard() {
           </div>
         </div>
 
-        {/* Platform health mini */}
-        <div className="ad-sidebar-health">
-          <div className="ad-health-row">
-            <span className="ad-health-dot ad-health-dot--white"/>
-            <span className="ad-health-label">API Connected</span>
-          </div>
-          <div className="ad-health-row">
-            <span className="ad-health-dot ad-health-dot--white"/>
-            <span className="ad-health-label">Gemini AI Active</span>
-          </div>
-        </div>
+
 
         <div className="ad-sidebar-divider"/>
 

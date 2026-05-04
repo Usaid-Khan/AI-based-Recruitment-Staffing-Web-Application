@@ -38,8 +38,8 @@ const TOOLS = [
     tagline: "Turn raw data into a polished professional biography.",
     desc: "Gemini reads your candidate's skills, experience and existing notes to draft a compelling, ready-to-publish bio in seconds.",
     roles: ["CANDIDATE"],
-    accent: "#2dd4bf",
-    accentDim: "rgba(45,212,191,0.12)",
+    accent: "#ffffff",
+    accentDim: "rgba(255,255,255,0.1)",
     badge: "Personal",
   },
   {
@@ -50,8 +50,8 @@ const TOOLS = [
     tagline: "Strip policy violations before a bio goes live.",
     desc: "Automatically removes discriminatory language, contact details, salary demands and any content that violates your agency's terms of service.",
     roles: ["ADMIN"],
-    accent: "#f59e0b",
-    accentDim: "rgba(245,158,11,0.12)",
+    accent: "#ffffff",
+    accentDim: "rgba(255,255,255,0.1)",
     badge: "Compliance",
   },
   {
@@ -62,8 +62,8 @@ const TOOLS = [
     tagline: "Write a complete, attractive job posting with one click.",
     desc: "Provide a job title and key skills — Gemini crafts a full vacancy with overview, responsibilities, requirements and offer sections.",
     roles: ["ADMIN", "EMPLOYER"],
-    accent: "#c9a84c",
-    accentDim: "rgba(201,168,76,0.14)",
+    accent: "#ffffff",
+    accentDim: "rgba(255,255,255,0.1)",
     badge: "Time-Saver",
   },
   {
@@ -74,8 +74,8 @@ const TOOLS = [
     tagline: "Enforce quality and compliance on every job posting.",
     desc: "Rewrites discriminatory, vague or non-compliant vacancy text to meet your agency's standards — automatically, at scale.",
     roles: ["ADMIN"],
-    accent: "#60a5fa",
-    accentDim: "rgba(96,165,250,0.12)",
+    accent: "#ffffff",
+    accentDim: "rgba(255,255,255,0.1)",
     badge: "Quality",
   },
   {
@@ -86,8 +86,8 @@ const TOOLS = [
     tagline: "AI ranks every available candidate for a given vacancy.",
     desc: "Gemini analyses vacancy requirements against candidate bios, skills and experience — then returns a scored, reasoned ranked list.",
     roles: ["ADMIN", "EMPLOYER"],
-    accent: "#22c55e",
-    accentDim: "rgba(34,197,94,0.12)",
+    accent: "#ffffff",
+    accentDim: "rgba(255,255,255,0.1)",
     badge: "Core AI",
   },
   {
@@ -98,8 +98,8 @@ const TOOLS = [
     tagline: "Draft legally-structured employment contracts instantly.",
     desc: "Supply the parties, position, salary and duration — Gemini produces a complete contract with all standard clauses and a signature block.",
     roles: ["ADMIN"],
-    accent: "#e879f9",
-    accentDim: "rgba(232,121,249,0.12)",
+    accent: "#ffffff",
+    accentDim: "rgba(255,255,255,0.1)",
     badge: "Admin Only",
   },
   {
@@ -110,8 +110,8 @@ const TOOLS = [
     tagline: "Never stare at a blank email again.",
     desc: "Choose the email type — interview invite, rejection, offer, follow-up — and get a professional, tone-matched template in seconds.",
     roles: ["ADMIN", "EMPLOYER"],
-    accent: "#f97316",
-    accentDim: "rgba(249,115,22,0.12)",
+    accent: "#ffffff",
+    accentDim: "rgba(255,255,255,0.1)",
     badge: "Popular",
   },
   {
@@ -122,8 +122,8 @@ const TOOLS = [
     tagline: "Publish thought-leadership content without a copywriter.",
     desc: "Give a topic, audience and tone — Gemini returns a full, SEO-friendly blog post with H1, subheadings, bullet points and a CTA.",
     roles: ["ADMIN"],
-    accent: "#c9a84c",
-    accentDim: "rgba(201,168,76,0.14)",
+    accent: "#ffffff",
+    accentDim: "rgba(255,255,255,0.1)",
     badge: "Content",
   },
 ];
@@ -185,8 +185,8 @@ function ResultPane({ result, loading, onCopy, onClear }) {
           <div className="at-result-actions">
             <button className="at-result-btn" onClick={onCopy}>
               <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
-                <rect x="4" y="4" width="8" height="8" rx="1" stroke="currentColor" strokeWidth="1.3"/>
-                <path d="M2 9V2a1 1 0 011-1h7" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round"/>
+                <rect x="4" y="4" width="8" height="8" rx="1" stroke="currentColor" strokeWidth="1.3" />
+                <path d="M2 9V2a1 1 0 011-1h7" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" />
               </svg>
               Copy
             </button>
@@ -423,11 +423,11 @@ function ContractGeneratorForm({ onRun, loading }) {
 function EmailGeneratorForm({ onRun, loading }) {
   const emailTypes = [
     { value: "interview_invite", label: "Interview Invite" },
-    { value: "rejection",        label: "Rejection" },
-    { value: "offer",            label: "Job Offer" },
-    { value: "follow_up",        label: "Follow-Up" },
-    { value: "welcome",          label: "Welcome / Onboarding" },
-    { value: "reference_request",label: "Reference Request" },
+    { value: "rejection", label: "Rejection" },
+    { value: "offer", label: "Job Offer" },
+    { value: "follow_up", label: "Follow-Up" },
+    { value: "welcome", label: "Welcome / Onboarding" },
+    { value: "reference_request", label: "Reference Request" },
   ];
   const [f, setF] = useState({
     emailType: "interview_invite", recipientName: "", recipientEmail: "",
@@ -621,14 +621,14 @@ async function runTool(toolId, formData) {
 }
 
 const FORM_MAP = {
-  "bio-generator":      BioGeneratorForm,
-  "bio-filter":         BioFilterForm,
-  "vacancy-generator":  VacancyGeneratorForm,
-  "vacancy-filter":     VacancyFilterForm,
-  "recommendations":    RecommendationsForm,
+  "bio-generator": BioGeneratorForm,
+  "bio-filter": BioFilterForm,
+  "vacancy-generator": VacancyGeneratorForm,
+  "vacancy-filter": VacancyFilterForm,
+  "recommendations": RecommendationsForm,
   "contract-generator": ContractGeneratorForm,
-  "email-generator":    EmailGeneratorForm,
-  "blog-generator":     BlogGeneratorForm,
+  "email-generator": EmailGeneratorForm,
+  "blog-generator": BlogGeneratorForm,
 };
 
 /* ─────────────────────────────────────────
@@ -658,18 +658,18 @@ function HistoryEntry({ entry, onRestore }) {
    MAIN PAGE
 ───────────────────────────────────────── */
 export default function AiToolsPage() {
-  const navigate  = useNavigate();
-  const user      = JSON.parse(localStorage.getItem("user") || "{}");
-  const userRole  = user?.role || "ADMIN";
+  const navigate = useNavigate();
+  const user = JSON.parse(localStorage.getItem("user") || "{}");
+  const userRole = user?.role || "ADMIN";
 
-  const [activeTool,   setActiveTool]   = useState(null);
-  const [result,       setResult]       = useState("");
-  const [loading,      setLoading]      = useState(false);
-  const [toast,        setToast]        = useState({ msg: "", type: "success" });
-  const [history,      setHistory]      = useState([]);
-  const [search,       setSearch]       = useState("");
-  const [catFilter,    setCatFilter]    = useState("All");
-  const [showHistory,  setShowHistory]  = useState(false);
+  const [activeTool, setActiveTool] = useState(null);
+  const [result, setResult] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [toast, setToast] = useState({ msg: "", type: "success" });
+  const [history, setHistory] = useState([]);
+  const [search, setSearch] = useState("");
+  const [catFilter, setCatFilter] = useState("All");
+  const [showHistory, setShowHistory] = useState(false);
 
   const notify = (msg, type = "success") => setToast({ msg, type });
 
@@ -750,7 +750,7 @@ export default function AiToolsPage() {
           <button className="at-back-btn" onClick={() => navigate(-1)}>
             <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
               <path d="M12 7.5H3M7 3.5L3 7.5l4 4" stroke="currentColor" strokeWidth="1.5"
-                strokeLinecap="round" strokeLinejoin="round"/>
+                strokeLinecap="round" strokeLinejoin="round" />
             </svg>
             Back
           </button>
@@ -765,7 +765,7 @@ export default function AiToolsPage() {
           <div className="at-header-right">
             <div className="at-gemini-badge">
               <span className="at-gemini-dot" />
-              Gemini 2.0 Flash
+              Google Gemini AI
             </div>
             {history.length > 0 && (
               <button
@@ -773,8 +773,8 @@ export default function AiToolsPage() {
                 onClick={() => setShowHistory(!showHistory)}
               >
                 <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                  <circle cx="7" cy="7" r="5.5" stroke="currentColor" strokeWidth="1.3"/>
-                  <path d="M7 4v3.5l2 1.5" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round"/>
+                  <circle cx="7" cy="7" r="5.5" stroke="currentColor" strokeWidth="1.3" />
+                  <path d="M7 4v3.5l2 1.5" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
                 History ({history.length})
               </button>
@@ -789,7 +789,7 @@ export default function AiToolsPage() {
           <div className="at-rail-hero">
             <div className="at-rail-eyebrow">AI Features</div>
             <h1 className="at-rail-title">
-              8 Tools.<br/>
+              All Tools.<br />
               <em>One workspace.</em>
             </h1>
             <p className="at-rail-sub">
@@ -801,8 +801,8 @@ export default function AiToolsPage() {
           <div className="at-rail-search-wrap">
             <span className="at-rail-search-icon">
               <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
-                <circle cx="5.5" cy="5.5" r="4" stroke="currentColor" strokeWidth="1.3"/>
-                <path d="M9 9l3 3" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round"/>
+                <circle cx="5.5" cy="5.5" r="4" stroke="currentColor" strokeWidth="1.3" />
+                <path d="M9 9l3 3" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" />
               </svg>
             </span>
             <input
