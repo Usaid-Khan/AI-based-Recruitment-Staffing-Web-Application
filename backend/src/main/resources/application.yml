@@ -62,8 +62,6 @@ spring:
 
 # ---------- App-level config -------------------------
 app:
-  cors:
-    allowed-origins: ${ALLOWED_ORIGINS:http://localhost:5173}
   redis:
     ai-cache-ttl: 3600    # cache AI responses for 1 hour (seconds)
   kafka:
