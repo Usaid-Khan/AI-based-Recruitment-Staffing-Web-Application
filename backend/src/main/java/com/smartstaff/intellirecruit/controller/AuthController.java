@@ -3,9 +3,12 @@ package com.smartstaff.intellirecruit.controller;
 import com.smartstaff.intellirecruit.dto.AuthResponse;
 import com.smartstaff.intellirecruit.dto.LoginRequest;
 import com.smartstaff.intellirecruit.dto.RegisterRequest;
+import com.smartstaff.intellirecruit.dto.employer.EmployerUpdateRequest;
 import com.smartstaff.intellirecruit.email.EmailService;
 import com.smartstaff.intellirecruit.entity.User;
 import com.smartstaff.intellirecruit.repository.UserRepository;
+import com.smartstaff.intellirecruit.service.CandidateService;
+import com.smartstaff.intellirecruit.service.EmployerService;
 import com.smartstaff.intellirecruit.utils.JwtUtil;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +37,10 @@ public class AuthController {
     private JwtUtil jwtUtil;
     @Autowired
     private EmailService emailService;
+    @Autowired
+    private CandidateService candidateService;
+    @Autowired
+    private EmployerService employerService;
 
     @PostMapping("/register")
     public ResponseEntity<AuthResponse> register(@Valid @RequestBody RegisterRequest request) {
@@ -50,6 +57,16 @@ public class AuthController {
                 .build();
 
         userRepository.save(user);
+        
+        // Auto-create basic profile
+        if (user.getRole() == User.Role.CANDIDATE) {
+            candidateService.createProfile(user.getId());
+        } else if (user.getRole() == User.Role.EMPLOYER) {
+            employerService.createProfile(user.getId(), 
+                EmployerUpdateRequest.builder()
+                    .companyName(user.getName() + "'s Company")
+                    .build());
+        }
 
         emailService.sendWelcomeEmail(
                 user.getEmail(),

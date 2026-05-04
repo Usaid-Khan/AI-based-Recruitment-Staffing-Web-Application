@@ -902,8 +902,14 @@ function Profile({ candidate, onRefresh }) {
     setAiLoading(true);
     setError("");
     try {
+      let currentCandidate = candidate;
+      if (!currentCandidate) {
+        currentCandidate = await apiFetch("/candidates/profile", { method: "POST" });
+        setCandidate(currentCandidate);
+      }
+
       const data = await apiFetch(
-        `/ai/candidates/${candidate.id}/generate-bio`,
+        `/ai/candidates/${currentCandidate.id}/generate-bio`,
         { method: "POST" }
       );
       setForm((f) => ({ ...f, bio: data.content }));
@@ -919,7 +925,15 @@ function Profile({ candidate, onRefresh }) {
     setLoading(true);
     setError("");
     try {
-      await apiFetch(`/candidates/${candidate.id}`, {
+      let currentCandidate = candidate;
+      
+      // If no profile exists, create skeleton first
+      if (!currentCandidate) {
+        currentCandidate = await apiFetch("/candidates/profile", { method: "POST" });
+        setCandidate(currentCandidate);
+      }
+
+      await apiFetch(`/candidates/${currentCandidate.id}`, {
         method: "PUT",
         body: JSON.stringify({
           ...form,
@@ -942,9 +956,15 @@ function Profile({ candidate, onRefresh }) {
     setUploadLoading(true);
     setError("");
     try {
+      let currentCandidate = candidate;
+      if (!currentCandidate) {
+        currentCandidate = await apiFetch("/candidates/profile", { method: "POST" });
+        setCandidate(currentCandidate);
+      }
+
       const fd = new FormData();
       fd.append("file", file);
-      const res = await fetch(`${BASE}/candidates/${candidate.id}/resume`, {
+      const res = await fetch(`${BASE}/candidates/${currentCandidate.id}/resume`, {
         method: "POST",
         headers: { Authorization: `Bearer ${token()}` },
         body: fd,
@@ -1179,11 +1199,20 @@ export default function CandidateDashboard() {
   const loadAll = async () => {
     setLoading(true);
     try {
-      const cand = await apiFetch("/candidates/me");
-      setCandidate(cand);
+      let cand = null;
+      try {
+        cand = await apiFetch("/candidates/me");
+        setCandidate(cand);
+      } catch (e) {
+        if (!e.message.includes("404") && !e.message.includes("not found")) {
+          throw e;
+        }
+        // If 404, we continue with cand=null so they can see dashboard and edit profile
+      }
+
       const [apps, placed] = await Promise.all([
         apiFetch("/applications/my"),
-        apiFetch(`/placements/candidate/${cand.id}`).catch(() => []),
+        cand ? apiFetch(`/placements/candidate/${cand.id}`).catch(() => []) : Promise.resolve([]),
       ]);
       setApplications(apps || []);
       setPlacements(placed || []);
@@ -1299,17 +1328,15 @@ export default function CandidateDashboard() {
         </div>
 
         {/* User card */}
-        {candidate && (
-          <div className="cd-sidebar-user">
-            <div className="cd-sidebar-avatar">
-              {candidate.name?.[0] || "C"}
-            </div>
-            <div className="cd-sidebar-user-info">
-              <div className="cd-sidebar-user-name">{candidate.name}</div>
-              <div className="cd-sidebar-user-email">{candidate.email}</div>
-            </div>
+        <div className="cd-sidebar-user">
+          <div className="cd-sidebar-avatar">
+            {candidate?.name?.[0] || user?.name?.[0] || "C"}
           </div>
-        )}
+          <div className="cd-sidebar-user-info">
+            <div className="cd-sidebar-user-name">{candidate?.name || user?.name || "Candidate"}</div>
+            <div className="cd-sidebar-user-email">{candidate?.email || user?.email}</div>
+          </div>
+        </div>
 
         {/* Profile completion mini */}
         {candidate && (
