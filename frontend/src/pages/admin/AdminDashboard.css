@@ -8,11 +8,11 @@
 
 :root {
   --ad-bg:         #000000;
-  --ad-surface:    #0a0a0a;
-  --ad-surface2:   #111111;
-  --ad-surface3:   #161616;
-  --ad-border:     rgba(255,255,255,0.08);
-  --ad-border2:    rgba(255,255,255,0.15);
+  --ad-surface:    #1a1a1a;
+  --ad-surface2:   #242424;
+  --ad-surface3:   #2e2e2e;
+  --ad-border:     rgba(255,255,255,0.1);
+  --ad-border2:    rgba(255,255,255,0.18);
   --ad-accent:     #ffffff;
   --ad-accent-light: #ffffff;
   --ad-accent-dim:   rgba(255,255,255,0.1);
