@@ -54,6 +54,10 @@ spring:
           json:
             trusted:
               packages: com.smartstaff.intellirecruit.kafka.event
+  cloudinary:
+    cloud-name: ${CLOUDINARY_NAME}
+    api-key: ${CLOUDINARY_API_KEY}
+    api-secret: ${CLOUDINARY_API_SECRET}
 
 #app:
 #  jwt:

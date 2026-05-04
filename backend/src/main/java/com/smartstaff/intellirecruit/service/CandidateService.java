@@ -29,6 +29,8 @@ public class CandidateService {
     private CandidateRepository candidateRepository;
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private CloudinaryService cloudinaryService;
 
     // Called after registration to create a candidate profile
     @Transactional
@@ -101,19 +103,13 @@ public class CandidateService {
         Candidate candidate = findById(id);
         verifyOwnershipOrAdmin(candidate.getUser().getEmail());
 
-        // Store in uploads/resumes directory
-        String uploadDir = "uploads/resumes/";
-        Files.createDirectories(Paths.get(uploadDir));
+        // Upload to Cloudinary
+        String secureUrl = cloudinaryService.uploadFile(file);
 
-        String filename = UUID.randomUUID() + "_" + file.getOriginalFilename();
-        Path filePath = Paths.get(uploadDir + filename);
-        Files.write(filePath, file.getBytes());
-
-        candidate.setResumeUrl("/resumes/" + filename);
-
+        candidate.setResumeUrl(secureUrl);
         candidateRepository.save(candidate);
 
-        return candidate.getResumeUrl();
+        return secureUrl;
     }
 
     @Transactional
