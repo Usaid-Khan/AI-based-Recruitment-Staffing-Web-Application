@@ -18,7 +18,7 @@ import {
   Sparkles
 } from "lucide-react";
 import "./EmployerDashboard.css";
-import api from "../../services/api";
+import api, { isTokenValid } from "../../services/api";
 
 /* ─────────────────────────────────────────
    Helpers
@@ -1250,6 +1250,12 @@ export default function EmployerDashboard() {
 
   /* ── Initial data load ── */
   useEffect(() => {
+    if (!isTokenValid()) {
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      navigate('/login', { replace: true });
+      return;
+    }
     loadAll();
   }, []);
 

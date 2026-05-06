@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { createPortal } from "react-dom";
 import ReactMarkdown from "react-markdown";
 import "./CandidateDashboard.css";
-import api from "../../services/api";
+import api, { isTokenValid } from "../../services/api";
 import { 
   LayoutDashboard, 
   Search, 
@@ -1197,7 +1197,15 @@ export default function CandidateDashboard() {
 
   const user = JSON.parse(localStorage.getItem("user") || "{}");
 
-  useEffect(() => { loadAll(); }, []);
+  useEffect(() => {
+    if (!isTokenValid()) {
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      navigate('/login', { replace: true });
+      return;
+    }
+    loadAll();
+  }, []);
 
   const loadAll = async () => {
     setLoading(true);

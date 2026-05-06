@@ -1,14 +1,26 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import "./Auth.css";
 import authService from "../../services/authService";
+import { isTokenValid } from "../../services/api";
 
 export default function Login() {
   const navigate = useNavigate();
   const [form, setForm] = useState({ email: "", password: "" });
   const [showPassword, setShowPassword] = useState(false);
+  const [rememberMe, setRememberMe] = useState(true);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
+  // If already logged in with a valid token, redirect to dashboard
+  useEffect(() => {
+    if (isTokenValid()) {
+      const user = JSON.parse(localStorage.getItem('user') || '{}');
+      if (user.role === 'ADMIN') navigate('/admin/dashboard', { replace: true });
+      else if (user.role === 'EMPLOYER') navigate('/employer/dashboard', { replace: true });
+      else navigate('/candidate/dashboard', { replace: true });
+    }
+  }, []);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -124,7 +136,12 @@ export default function Login() {
           </div>
 
           <label className="auth-checkbox-row">
-            <input type="checkbox" className="auth-checkbox" />
+            <input
+              type="checkbox"
+              className="auth-checkbox"
+              checked={rememberMe}
+              onChange={(e) => setRememberMe(e.target.checked)}
+            />
             <span className="auth-checkbox-custom" />
             <span className="auth-checkbox-label">Keep me signed in</span>
           </label>

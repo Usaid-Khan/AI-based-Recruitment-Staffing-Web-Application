@@ -12,21 +12,50 @@ const api = axios.create({
   },
 });
 
-// Add a request interceptor to include the JWT token in all requests
+/**
+ * Decode a JWT and return its payload, or null if invalid/missing.
+ */
+export function decodeToken(token) {
+  try {
+    const payload = token.split('.')[1];
+    return JSON.parse(atob(payload));
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Returns true if the stored token is present and not yet expired.
+ */
+export function isTokenValid() {
+  const token = localStorage.getItem('token');
+  if (!token) return false;
+  const decoded = decodeToken(token);
+  if (!decoded || !decoded.exp) return false;
+  // exp is in seconds, Date.now() is in ms
+  return decoded.exp * 1000 > Date.now();
+}
+
+// Request interceptor — attach token if it's still valid
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token');
     if (token) {
+      // If token is expired, clear storage before the request even goes out
+      if (!isTokenValid()) {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        window.location.href = '/login';
+        return Promise.reject(new Error('Session expired. Please log in again.'));
+      }
       config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
   },
-  (error) => {
-    return Promise.reject(error);
-  }
+  (error) => Promise.reject(error)
 );
 
-// Add a response interceptor to handle token expiration or unauthorized access
+// Response interceptor — handle 401 from backend
 api.interceptors.response.use(
   (response) => response,
   (error) => {

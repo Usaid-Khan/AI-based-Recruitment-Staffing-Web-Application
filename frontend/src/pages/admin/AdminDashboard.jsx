@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import { useNavigate } from "react-router-dom";
 import "./AdminDashboard.css";
+import { isTokenValid } from "../../services/api";
 
 /* ─────────────────────────────────────────
    API Helpers
@@ -1309,7 +1310,15 @@ export default function AdminDashboard() {
 
   const notify = (msg, type = "success") => setToast({ msg, type });
 
-  useEffect(() => { loadStats(); }, []);
+  useEffect(() => {
+    if (!isTokenValid()) {
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      navigate('/login', { replace: true });
+      return;
+    }
+    loadStats();
+  }, []);
 
   const loadStats = async () => {
     setLoading(true);
