@@ -25,7 +25,8 @@ import {
   ShieldCheck,
   Zap,
   Star,
-  X
+  X,
+  BookOpen
 } from "lucide-react";
 
 /* ─────────────────────────────────────────
@@ -1239,6 +1240,10 @@ export default function CandidateDashboard() {
       navigate("/ai/tools");
       return;
     }
+    if (section === "public-blog") {
+      navigate("/blog");
+      return;
+    }
     setActiveSection(section);
     setSidebarOpen(false);
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -1288,6 +1293,7 @@ export default function CandidateDashboard() {
     { id: "placements",    icon: <Briefcase size={20} />, label: "Placements",   badge: placements.length },
     { id: "profile",       icon: <User size={20} />, label: "My Profile" },
     { id: "ai-tools",      icon: <Sparkles size={20} />, label: "AI Tools" },
+    { id: "public-blog",   icon: <BookOpen size={20} />, label: "Blog" },
   ];
 
   return (

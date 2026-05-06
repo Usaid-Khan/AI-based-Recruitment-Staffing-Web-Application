@@ -1351,6 +1351,10 @@ export default function AdminDashboard() {
       navigate("/ai/tools");
       return;
     }
+    if (section === "public-blog") {
+      navigate("/blog");
+      return;
+    }
     setActiveSection(section);
     setSidebarOpen(false);
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -1393,8 +1397,9 @@ export default function AdminDashboard() {
     { id: "placements", icon: "⬡", label: "Placements", badge: stats.placements },
     { id: "orders",     icon: "◎", label: "Orders",     badge: stats.orders },
     { id: "vacancies",  icon: "✦", label: "Vacancies",  badge: stats.vacancies },
-    { id: "blog",       icon: "✧", label: "Blog",       badge: stats.blogs },
+    { id: "blog",       icon: "✧", label: "Blog Manager",badge: stats.blogs },
     { id: "ai-tools",   icon: "❖", label: "AI Tools" },
+    { id: "public-blog",icon: "❐", label: "View Blog" },
   ];
 
   return (

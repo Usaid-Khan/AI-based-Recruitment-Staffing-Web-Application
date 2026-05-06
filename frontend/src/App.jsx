@@ -7,11 +7,13 @@ import CandidateDashboard from './pages/candidate/CandidateDashboard'
 import EmployerDashboard from './pages/employer/EmployerDashboard'
 import AdminDashboard from './pages/admin/AdminDashboard'
 import AiToolsPage from './pages/ai/AiToolsPage'
+import BlogPage from './public/BlogPage'
 
 function App() {
   return (
     <Routes>
       <Route path="/" element={<Home />} />
+      <Route path="/blog" element={<BlogPage />} />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
       <Route path="/candidate/dashboard" element={<CandidateDashboard />} />

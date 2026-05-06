@@ -15,7 +15,8 @@ import {
   CheckCircle,
   Clock,
   X,
-  Sparkles
+  Sparkles,
+  BookOpen
 } from "lucide-react";
 import "./EmployerDashboard.css";
 import api, { isTokenValid } from "../../services/api";
@@ -1303,6 +1304,10 @@ export default function EmployerDashboard() {
       navigate("/ai/tools");
       return;
     }
+    if (section === "public-blog") {
+      navigate("/blog");
+      return;
+    }
     setActiveSection(section);
     setActiveSectionData(data);
     setSidebarOpen(false);
@@ -1352,6 +1357,7 @@ export default function EmployerDashboard() {
     { id: "orders",       icon: <ClipboardList size={20} />, label: "Orders",       badge: orders.filter(o => o.status === "PENDING").length },
     { id: "profile",      icon: <Settings size={20} />, label: "Profile" },
     { id: "ai-tools",     icon: <Sparkles size={20} />, label: "AI Tools" },
+    { id: "public-blog",  icon: <BookOpen size={20} />, label: "Blog" },
   ];
 
   return (

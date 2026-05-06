@@ -291,6 +291,7 @@ export default function Home() {
             <li><a href="#features" className={activeSection === "features" ? "active" : ""} onClick={() => setMenuOpen(false)}>Features</a></li>
             <li><a href="#how-it-works" className={activeSection === "how-it-works" ? "active" : ""} onClick={() => setMenuOpen(false)}>How It Works</a></li>
             <li><a href="#testimonials" className={activeSection === "testimonials" ? "active" : ""} onClick={() => setMenuOpen(false)}>Testimonials</a></li>
+            <li><a href="/blog" onClick={(e) => { e.preventDefault(); navigate("/blog"); setMenuOpen(false); }}>Blog</a></li>
           </ul>
 
           <div className="nav-actions">
@@ -603,6 +604,7 @@ export default function Home() {
               <div className="footer-col-title">Platform</div>
               <a href="#features">Features</a>
               <a href="#how-it-works">How It Works</a>
+              <a href="/blog">Blog</a>
               <a href="/login">Sign In</a>
               <a href="/register">Register</a>
             </div>
