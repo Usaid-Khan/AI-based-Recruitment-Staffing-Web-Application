@@ -17,9 +17,25 @@ const api = axios.create({
  */
 export function decodeToken(token) {
   try {
-    const payload = token.split('.')[1];
-    return JSON.parse(atob(payload));
-  } catch {
+    let base64Url = token.split('.')[1];
+    let base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    
+    // Pad with '=' so length is a multiple of 4
+    const pad = base64.length % 4;
+    if (pad) {
+      if (pad === 1) {
+        throw new Error('InvalidLengthError: Input base64url string is the wrong length to determine padding');
+      }
+      base64 += new Array(5 - pad).join('=');
+    }
+    
+    const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+    }).join(''));
+
+    return JSON.parse(jsonPayload);
+  } catch (err) {
+    console.error("Failed to decode token", err);
     return null;
   }
 }
