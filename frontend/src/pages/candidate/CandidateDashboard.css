@@ -7,32 +7,32 @@
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=DM+Sans:wght@300;400;500;600&display=swap');
 
 /* ── Design Tokens ── */
-:root {
-  --c-bg:         #0a0b0e;
-  --c-surface:    #111318;
-  --c-surface2:   #181c24;
-  --c-surface3:   #1e2330;
-  --c-border:     rgba(255,255,255,0.07);
-  --c-border2:    rgba(255,255,255,0.12);
-  --c-gold:       #c9a84c;
-  --c-gold-light: #e4c76b;
-  --c-gold-dim:   rgba(201,168,76,0.15);
-  --c-teal:       #2dd4bf;
-  --c-teal-light: #5eead4;
-  --c-teal-dim:   rgba(45,212,191,0.12);
-  --c-red:        #ef4444;
-  --c-red-dim:    rgba(239,68,68,0.1);
-  --c-text:       #e8e9ec;
-  --c-text-muted: #8a8f9e;
-  --c-text-dim:   #4a4f5e;
-  --font-display: 'Playfair Display', Georgia, serif;
+.cd-root {
+  --c-bg:         #000000;
+  --c-surface:    #1a1a1a;
+  --c-surface2:   #242424;
+  --c-surface3:   #2e2e2e;
+  --c-border:     rgba(255,255,255,0.12);
+  --c-border2:    rgba(255,255,255,0.22);
+  --c-gold:       #ffffff;
+  --c-gold-light: #ffffff;
+  --c-gold-dim:   rgba(255,255,255,0.1);
+  --c-teal:       #ffffff;
+  --c-teal-light: #ffffff;
+  --c-teal-dim:   rgba(255,255,255,0.08);
+  --c-red:        #ff4d4d;
+  --c-red-dim:    rgba(255,77,77,0.1);
+  --c-text:       #ffffff;
+  --c-text-muted: #a0a0a0;
+  --c-text-dim:   #666666;
+  --font-display: 'DM Sans', system-ui, sans-serif;
   --font-body:    'DM Sans', system-ui, sans-serif;
   --sidebar-w:    240px;
   --topbar-h:     56px;
-  --radius-sm:    6px;
-  --radius-md:    12px;
-  --radius-lg:    18px;
-  --radius-xl:    24px;
+  --radius-sm:    4px;
+  --radius-md:    8px;
+  --radius-lg:    12px;
+  --radius-xl:    16px;
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -66,17 +66,17 @@
 .cd-ambient-orb--1 {
   width: 600px; height: 600px;
   top: -200px; right: -100px;
-  background: radial-gradient(circle, rgba(45,212,191,0.1) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(255,255,255,0.03) 0%, transparent 70%);
 }
 .cd-ambient-orb--2 {
   width: 400px; height: 400px;
   bottom: -100px; left: 200px;
-  background: radial-gradient(circle, rgba(201,168,76,0.08) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(255,255,255,0.02) 0%, transparent 70%);
 }
 .cd-ambient-orb--3 {
   width: 300px; height: 300px;
   top: 40%; left: 50%;
-  background: radial-gradient(circle, rgba(45,212,191,0.05) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(255,255,255,0.01) 0%, transparent 70%);
   animation: cdOrb 18s ease-in-out infinite;
 }
 @keyframes cdOrb {
@@ -833,6 +833,7 @@
 }
 .cd-vacancy-card {
   background: var(--c-surface);
+  box-shadow: none;
   border: 1px solid var(--c-border2);
   border-radius: var(--radius-lg);
   padding: 22px;
@@ -864,7 +865,8 @@
 .cd-vacancy-logo {
   width: 42px; height: 42px;
   border-radius: 12px;
-  background: linear-gradient(135deg, var(--c-gold), var(--c-teal));
+  background: #ffffff;
+  border: 1px solid var(--c-border2);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -914,11 +916,11 @@
   gap: 8px;
 }
 .cd-applied-tag {
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 700;
-  color: var(--c-teal);
-  background: var(--c-teal-dim);
-  border: 1px solid rgba(45,212,191,0.2);
+  color: #93c5fd;
+  background: rgba(147,197,253,0.15);
+  border: 1px solid rgba(147,197,253,0.2);
   padding: 5px 12px;
   border-radius: var(--radius-sm);
 }
@@ -952,7 +954,8 @@
 .cd-detail-logo {
   width: 48px; height: 48px;
   border-radius: 14px;
-  background: linear-gradient(135deg, var(--c-gold), var(--c-teal));
+  background: #ffffff;
+  border: 1px solid var(--c-border2);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1201,7 +1204,8 @@
 .cd-placement-logo {
   width: 50px; height: 50px;
   border-radius: 14px;
-  background: linear-gradient(135deg, var(--c-gold), var(--c-teal));
+  background: #ffffff;
+  border: 1px solid var(--c-border2);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1635,11 +1639,11 @@
 @keyframes cdOverlayFade { from { opacity: 0; } to { opacity: 1; } }
 .cd-modal {
   width: 100%;
-  background: var(--c-surface);
+  background: #1e1e1e;
   border: 1px solid var(--c-border2);
-  border-radius: var(--radius-xl);
+  border-radius: var(--radius-lg);
   overflow: hidden;
-  box-shadow: 0 40px 80px rgba(0,0,0,0.65);
+  box-shadow: 0 40px 100px rgba(0,0,0,0.85);
   animation: cdModalSlide 0.3s ease both;
   display: flex;
   flex-direction: column;
