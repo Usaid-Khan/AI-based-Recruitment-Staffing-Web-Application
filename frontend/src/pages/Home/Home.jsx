@@ -292,6 +292,8 @@ export default function Home() {
             <li><a href="#how-it-works" className={activeSection === "how-it-works" ? "active" : ""} onClick={() => setMenuOpen(false)}>How It Works</a></li>
             <li><a href="#testimonials" className={activeSection === "testimonials" ? "active" : ""} onClick={() => setMenuOpen(false)}>Testimonials</a></li>
             <li><a href="/blog" onClick={(e) => { e.preventDefault(); navigate("/blog"); setMenuOpen(false); }}>Blog</a></li>
+            <li className="mobile-only"><a href="/login" onClick={(e) => { e.preventDefault(); navigate("/login"); setMenuOpen(false); }}>Sign In</a></li>
+            <li className="mobile-only"><a href="/register" onClick={(e) => { e.preventDefault(); navigate("/register"); setMenuOpen(false); }}>Get Started</a></li>
           </ul>
 
           <div className="nav-actions">

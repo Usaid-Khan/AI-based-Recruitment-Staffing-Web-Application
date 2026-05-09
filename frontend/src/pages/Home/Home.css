@@ -140,6 +140,10 @@
   display: block;
 }
 
+.mobile-only {
+  display: none;
+}
+
 .nav-links a.active {
   color: var(--c-text);
 }
@@ -1156,6 +1160,46 @@
   border-color: rgba(255, 255, 255, 0.25);
 }
 
+.btn-primary:hover {
+  background: #ffffff;
+  color: #000000;
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+}
+
+/* Hamburger */
+.hamburger {
+  display: none;
+  flex-direction: column;
+  gap: 5px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  z-index: 1001;
+  position: relative;
+}
+
+.hamburger span {
+  display: block;
+  width: 22px;
+  height: 2px;
+  background: var(--c-text);
+  border-radius: 2px;
+  transition: transform 0.3s, opacity 0.3s;
+}
+
+.hamburger--open span:nth-child(1) {
+  transform: translateY(7px) rotate(45deg);
+}
+
+.hamburger--open span:nth-child(2) {
+  opacity: 0;
+}
+
+.hamburger--open span:nth-child(3) {
+  transform: translateY(-7px) rotate(-45deg);
+}
+
 .btn-role--featured {
   background: var(--c-primary);
   border-color: var(--c-primary);
@@ -1468,24 +1512,43 @@
 @media (max-width: 768px) {
   .navbar-inner {
     padding: 0 20px;
+    justify-content: space-between;
   }
 
   .nav-links {
     position: fixed;
-    top: var(--nav-h);
+    top: 0;
     left: 0;
     right: 0;
+    bottom: 0;
+    height: 100vh;
     background: #000000;
-    backdrop-filter: none;
     flex-direction: column;
-    padding: 20px;
-    border-bottom: 1px solid var(--c-border);
-    transform: translateY(-110%);
-    transition: transform 0.35s ease;
+    justify-content: center;
+    align-items: center;
+    padding: 40px;
+    gap: 32px;
+    z-index: 1000;
+    transform: translateX(100%);
+    transition: transform 0.4s cubic-bezier(0.23, 1, 0.32, 1);
   }
 
   .nav-links--open {
-    transform: translateY(0);
+    transform: translateX(0);
+  }
+
+  .nav-links li.mobile-only {
+    display: block;
+  }
+
+  .nav-links a {
+    font-size: 24px;
+    font-weight: 600;
+    color: var(--c-text);
+  }
+
+  .nav-pill {
+    display: none;
   }
 
   .nav-actions {
@@ -1494,6 +1557,7 @@
 
   .hamburger {
     display: flex;
+    margin-left: auto;
   }
 
   .hero {

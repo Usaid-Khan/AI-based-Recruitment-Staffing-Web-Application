@@ -431,6 +431,7 @@ export default function BlogPage() {
   const [search, setSearch]     = useState("");
   const [selected, setSelected] = useState(null);
   const [scrolled, setScrolled] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
   const heroRef = useRef(null);
 
   useEffect(() => {
@@ -476,9 +477,29 @@ export default function BlogPage() {
             <span className="bp-nav-name">IntelliRecruit</span>
           </button>
 
-          <div className="bp-nav-links">
-            <button className="bp-nav-link" onClick={() => navigate("/")}>Home</button>
-            <button className="bp-nav-link bp-nav-link--active">Blog</button>
+          <div className={`bp-nav-links ${menuOpen ? "bp-nav-links--open" : ""}`}>
+            <button className="bp-nav-link" onClick={() => { navigate("/"); setMenuOpen(false); }}>Home</button>
+            <button className="bp-nav-link bp-nav-link--active" onClick={() => setMenuOpen(false)}>Blog</button>
+            {isLoggedIn && (
+              <button 
+                className="bp-nav-link bp-nav-mobile-only" 
+                onClick={() => {
+                  const role = user?.role;
+                  if (role === "ADMIN") navigate("/admin/dashboard");
+                  else if (role === "EMPLOYER") navigate("/employer/dashboard");
+                  else navigate("/candidate/dashboard");
+                  setMenuOpen(false);
+                }}
+              >
+                Dashboard
+              </button>
+            )}
+            {!isLoggedIn && (
+              <>
+                <button className="bp-nav-link bp-nav-mobile-only" onClick={() => { navigate("/login"); setMenuOpen(false); }}>Sign In</button>
+                <button className="bp-nav-link bp-nav-mobile-only" onClick={() => { navigate("/register"); setMenuOpen(false); }}>Get Started</button>
+              </>
+            )}
           </div>
 
           <div className="bp-nav-right">
@@ -501,6 +522,14 @@ export default function BlogPage() {
               </>
             )}
           </div>
+
+          <button 
+            className={`bp-hamburger ${menuOpen ? "bp-hamburger--open" : ""}`}
+            onClick={() => setMenuOpen(!menuOpen)}
+            aria-label="Toggle menu"
+          >
+            <span /><span /><span />
+          </button>
         </div>
       </nav>
 
